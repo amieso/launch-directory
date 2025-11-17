@@ -25,6 +25,7 @@ const DATA_FILE = path.join(projectRoot, 'app', 'videos.json');
 
 // Command line args
 const isDryRun = process.argv.includes('--dry-run');
+const skipPolling = process.argv.includes('--no-poll');
 
 // Initialize Mux client
 const mux = new Mux({
@@ -207,6 +208,95 @@ async function processVideo(videoPath, data) {
 }
 
 /**
+ * Poll Mux for video status updates until all videos are ready
+ */
+async function pollForPlaybackIds(intervalSeconds = 30, maxAttempts = 20) {
+  console.log('\n🔄 Auto-polling for playback IDs...\n');
+  console.log(`   Checking every ${intervalSeconds} seconds (max ${maxAttempts} attempts)`);
+
+  let attempt = 0;
+
+  while (attempt < maxAttempts) {
+    attempt++;
+
+    // Load current data
+    const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+
+    // Find videos without playback IDs
+    const pendingVideos = data.videos.filter(v => !v.playbackId);
+
+    if (pendingVideos.length === 0) {
+      console.log('\n✅ All videos have playback IDs!');
+      return;
+    }
+
+    console.log(`\n⏳ Attempt ${attempt}/${maxAttempts} - Checking ${pendingVideos.length} video(s)...`);
+
+    let updated = 0;
+
+    for (const video of pendingVideos) {
+      try {
+        // If we don't have an asset ID yet, try to get it from the upload
+        if (!video.muxAssetId && video.muxUploadId) {
+          const upload = await mux.video.uploads.retrieve(video.muxUploadId);
+
+          if (upload.asset_id) {
+            video.muxAssetId = upload.asset_id;
+            video.id = upload.asset_id;
+            console.log(`   ${video.title}: Got asset ID`);
+          } else {
+            console.log(`   ${video.title}: Still uploading...`);
+            continue;
+          }
+        }
+
+        // Fetch asset from Mux
+        const asset = await mux.video.assets.retrieve(video.muxAssetId);
+
+        if (asset.status === 'ready' && asset.playback_ids?.length > 0) {
+          video.playbackId = asset.playback_ids[0].id;
+          video.status = 'ready';
+          console.log(`   ${video.title}: ✅ Ready!`);
+          updated++;
+        } else if (asset.status === 'preparing') {
+          console.log(`   ${video.title}: Preparing...`);
+          video.status = 'preparing';
+        } else if (asset.status === 'errored') {
+          console.log(`   ${video.title}: ❌ Error`);
+          video.status = 'errored';
+        }
+
+      } catch (error) {
+        console.error(`   ${video.title}: ❌ ${error.message}`);
+      }
+    }
+
+    // Save updated data
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+
+    if (updated > 0) {
+      console.log(`\n   Updated ${updated} video(s)`);
+    }
+
+    // Check if we're done
+    const stillPending = data.videos.filter(v => !v.playbackId);
+    if (stillPending.length === 0) {
+      console.log('\n✅ All videos are ready!');
+      return;
+    }
+
+    // Wait before next attempt (unless this is the last attempt)
+    if (attempt < maxAttempts) {
+      console.log(`\n   Waiting ${intervalSeconds} seconds before next check...`);
+      await new Promise(resolve => setTimeout(resolve, intervalSeconds * 1000));
+    }
+  }
+
+  console.log('\n⚠️  Max attempts reached. Some videos may still be processing.');
+  console.log('   Run "npm run update-playback-ids" to check again later.');
+}
+
+/**
  * Main processing function
  */
 async function main() {
@@ -277,10 +367,16 @@ async function main() {
 
   console.log('\n🎉 Done!\n');
 
-  if (results.length > 0) {
+  // Auto-poll for playback IDs if videos were uploaded
+  if (results.length > 0 && !isDryRun && !skipPolling) {
+    console.log('⚠️  Note: Mux is still processing your videos.');
+    console.log('   Starting auto-polling...\n');
+
+    await pollForPlaybackIds();
+  } else if (results.length > 0 && skipPolling) {
     console.log('⚠️  Note: Mux is still processing your videos.');
     console.log('   Playback URLs will be available in a few minutes.');
-    console.log('   Run the update script to fetch playback IDs.');
+    console.log('   Run "npm run update-playback-ids" to fetch playback IDs.');
   }
 }
 
