@@ -106,9 +106,7 @@ export function VideoCard({ video }: VideoCardProps) {
       {/* Status badge for non-ready videos */}
       {(!video.playbackId || video.status !== 'ready') && (
         <div className="absolute top-2 right-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
-          {video.status === 'uploading'
-            ? 'Uploading...'
-            : video.status === 'preparing'
+          {video.status === 'preparing'
             ? 'Processing...'
             : video.status === 'errored'
             ? 'Error'
