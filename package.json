@@ -2,13 +2,20 @@
   "name": "website",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "download": "node scripts/download-media.js",
+    "process": "node scripts/process-videos.js",
+    "process:dry-run": "node scripts/process-videos.js --dry-run",
+    "update-playback-ids": "node scripts/update-playback-ids.js"
   },
   "dependencies": {
+    "@mux/mux-node": "^12.8.0",
+    "dotenv": "^16.4.5",
     "hls.js": "^1.6.14",
     "next": "16.0.3",
     "react": "19.2.0",
