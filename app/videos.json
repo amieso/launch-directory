@@ -15,6 +15,54 @@
       "muxAssetId": "7wbYqMj5KHifC14K5KsxiRVn1UEJyJ4mwj4zMNuRhto",
       "id": "7wbYqMj5KHifC14K5KsxiRVn1UEJyJ4mwj4zMNuRhto",
       "status": "ready"
+    },
+    {
+      "id": "w1AHP67WNpnMuhnhjp4JAVihsJrqrOPWsae84hxSvnE",
+      "title": "Lightfield",
+      "muxAssetId": null,
+      "muxUploadId": "w1AHP67WNpnMuhnhjp4JAVihsJrqrOPWsae84hxSvnE",
+      "playbackId": null,
+      "placeholder": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgABoAFtAAD//gAQTGF2YzYyLjExLjEwMAD/2wBDAAgKCgsKCw0NDQ0NDRAPEBAQEBAQEBAQEBASEhIVFRUSEhIQEBISFBQVFRcXFxUVFRUXFxkZGR4eHBwjIyQrKzP/xABsAAEBAQAAAAAAAAAAAAAAAAAEBQcBAAMBAAAAAAAAAAAAAAAAAAACAwQQAAEDAgIGCwEAAAAAAAAAAAECAwQAERNSIWESkUEiFBUxI5LBonLhUUIyEQEBAQEBAAAAAAAAAAAAAAAAARExIf/AABEIAA0AFAMBIgACEQADEQD/2gAMAwEAAhEDEQA/AMWkDv3AM1VokbZaS4eK7ekHzqS9zOuHWarxXzg4NtCFIUD7k6b7tFF4VpUWHjRWFBQHJbsOZVJ6uOcbjRYr7iIrATs/xxF/0ddJ6U99o8PzWO7q3j//2Q==",
+      "checksum": "5685f5312cd3cecff51f93af845f6175",
+      "sourceFile": "lightfield.mp4",
+      "duration": 187.306667,
+      "width": 2048,
+      "height": 1168,
+      "size": 31896222,
+      "uploadedAt": "2025-11-17T12:30:32.134Z",
+      "status": "uploading"
+    },
+    {
+      "id": "lEVEM32IFEfOSQFVWfx7z5fb34pQrBua5iaKX00TH8Q00",
+      "title": "We Just Crossed $100M ARR In 8 Months IN GxsYK Pg",
+      "muxAssetId": null,
+      "muxUploadId": "lEVEM32IFEfOSQFVWfx7z5fb34pQrBua5iaKX00TH8Q00",
+      "playbackId": null,
+      "placeholder": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAANAAtAAD//gAQTGF2YzYyLjExLjEwMAD/2wBDAAgKCgsKCw0NDQ0NDRAPEBAQEBAQEBAQEBASEhIVFRUSEhIQEBISFBQVFRcXFxUVFRUXFxkZGR4eHBwjIyQrKzP/xABuAAEBAQEBAAAAAAAAAAAAAAAHBAMBBQEBAQEAAAAAAAAAAAAAAAAAAwEEEAACAQMDBAMBAQAAAAAAAAABAgMRAAQhMRIiBVFhcRRBQpERAAEDAgcBAAAAAAAAAAAAAAIBEQADFBMh4WGhUTEy/8AAEQgADQAUAwEiAAIRAAMRAP/aAAwDAQACEQMRAD8AN+15Jxs1CkZdnbhTYGpAGp292gzz5HakE7wk82ZSUcGhJJGlNqbEWSRzvCySqepGBX5F+9J3vJzY44pAByJqQT/G2nnXW6dBMQUf69WMBsBbZpIs+f7GQ0nE9VCdP24K+j/l8lUhz1XlQ+be3TvjWZ3ef//Z",
+      "checksum": "5f7097b35d114626827a7ba377e0aff4",
+      "sourceFile": "We just crossed $100M ARR in 8 months-IN_GxsYK_Pg.mp4",
+      "duration": 92.29932,
+      "width": 1920,
+      "height": 1080,
+      "size": 22564791,
+      "uploadedAt": "2025-11-17T12:52:15.904Z",
+      "status": "uploading"
+    },
+    {
+      "id": "6jIj96hO5pYc00eY9WQKeXPX7lCgs5mAz6nglU1nqDE4",
+      "title": "Lovable",
+      "muxAssetId": null,
+      "muxUploadId": "6jIj96hO5pYc00eY9WQKeXPX7lCgs5mAz6nglU1nqDE4",
+      "playbackId": null,
+      "placeholder": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAANAAtAAD//gAQTGF2YzYyLjExLjEwMAD/2wBDAAgKCgsKCw0NDQ0NDRAPEBAQEBAQEBAQEBASEhIVFRUSEhIQEBISFBQVFRcXFxUVFRUXFxkZGR4eHBwjIyQrKzP/xABuAAEBAQEBAAAAAAAAAAAAAAAHBAMBBQEBAQEAAAAAAAAAAAAAAAAAAwEEEAACAQMDBAMBAQAAAAAAAAABAgMRAAQhMRIiBVFhcRRBQpERAAEDAgcBAAAAAAAAAAAAAAIBEQADFBMh4WGhUTEy/8AAEQgADQAUAwEiAAIRAAMRAP/aAAwDAQACEQMRAD8AN+15Jxs1CkZdnbhTYGpAGp292gzz5HakE7wk82ZSUcGhJJGlNqbEWSRzvCySqepGBX5F+9J3vJzY44pAByJqQT/G2nnXW6dBMQUf69WMBsBbZpIs+f7GQ0nE9VCdP24K+j/l8lUhz1XlQ+be3TvjWZ3ef//Z",
+      "checksum": "5f7097b35d114626827a7ba377e0aff4",
+      "sourceFile": "lovable.mp4",
+      "duration": 92.29932,
+      "width": 1920,
+      "height": 1080,
+      "size": 22564791,
+      "uploadedAt": "2025-11-17T12:52:36.024Z",
+      "status": "uploading"
     }
   ]
 }
