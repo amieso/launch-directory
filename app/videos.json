@@ -1,0 +1,20 @@
+{
+  "videos": [
+    {
+      "title": "PEdxLu 2by5sR5Da",
+      "muxUploadId": "yKvUmQlbNBPafR5zWPHVS3P013awISvk024jrBcXysFBA",
+      "playbackId": "Mzhq00ln0100XwK2irqOToKHwhod1ad1T1B7yxFJpgrfV4",
+      "placeholder": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAANAAtAAD//gAQTGF2YzYyLjExLjEwMAD/2wBDAAgKCgsKCw0NDQ0NDRAPEBAQEBAQEBAQEBASEhIVFRUSEhIQEBISFBQVFRcXFxUVFRUXFxkZGR4eHBwjIyQrKzP/xABaAAEBAQAAAAAAAAAAAAAAAAAABwUBAQEAAAAAAAAAAAAAAAAAAAABEAACAQQCAwEBAAAAAAAAAAABAgMEBREAIRIxBkFRMhEBAAAAAAAAAAAAAAAAAAAAAP/AABEIAA0AFAMBIgACEQADEQD/2gAMAwEAAhEDEQA/AJtYbfFdrrSUUrOiTOysyY7DCM3HYEeR+bQvZPSrfZrVPWwz1bvFJGgWUx9T2cKf5jU+Dwc7J4KiallSaCR4ZEOUdCVZTjHBHI4ON0am9XWtiMNTX1U8ZIJSSVmUkHIyCfh5G1GPrWtD/9k=",
+      "checksum": "9b10d4a5ef4deb71b8d63018f9ca45ae",
+      "sourceFile": "pEdxLu-2by5sR5Da.mp4",
+      "duration": 54.08,
+      "width": 1920,
+      "height": 1080,
+      "size": 10553956,
+      "uploadedAt": "2025-11-17T11:46:54.755Z",
+      "muxAssetId": "7wbYqMj5KHifC14K5KsxiRVn1UEJyJ4mwj4zMNuRhto",
+      "id": "7wbYqMj5KHifC14K5KsxiRVn1UEJyJ4mwj4zMNuRhto",
+      "status": "ready"
+    }
+  ]
+}
