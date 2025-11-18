@@ -21,7 +21,13 @@ const UPLOADS_DIR = path.join(projectRoot, '..', 'uploads');
 const PROCESSED_DIR = path.join(UPLOADS_DIR, 'processed');
 const DUPLICATES_DIR = path.join(UPLOADS_DIR, 'duplicates');
 const FAILED_DIR = path.join(UPLOADS_DIR, 'failed');
+const PREVIEWS_DIR = path.join(projectRoot, 'public', 'previews');
 const DATA_FILE = path.join(projectRoot, 'app', 'videos.json');
+
+// Create previews directory if it doesn't exist
+if (!fs.existsSync(PREVIEWS_DIR)) {
+  fs.mkdirSync(PREVIEWS_DIR, { recursive: true });
+}
 
 // Command line args
 const isDryRun = process.argv.includes('--dry-run');
@@ -42,27 +48,54 @@ function calculateChecksum(filePath) {
 }
 
 /**
- * Extract a single frame from video for placeholder
+ * Extract dominant color from video's first frame
  */
-async function extractPlaceholder(videoPath, outputPath) {
+async function extractDominantColor(videoPath) {
+  const tempPath = path.join(UPLOADS_DIR, `temp_${Date.now()}.rgb`);
+  const escapedVideoPath = videoPath.replace(/'/g, "'\\''");
+  const escapedTempPath = tempPath.replace(/'/g, "'\\''");
+
+  // Extract first frame, scale to 1x1 pixel (averages all colors), output as raw RGB
+  const command = `ffmpeg -i '${escapedVideoPath}' -vf "select=eq(n\\,0),scale=1:1" -frames:v 1 -f rawvideo -pix_fmt rgb24 '${escapedTempPath}'`;
+
+  try {
+    await execPromise(command);
+
+    // Read the 3 bytes (RGB values)
+    const buffer = fs.readFileSync(tempPath);
+    const r = buffer[0];
+    const g = buffer[1];
+    const b = buffer[2];
+
+    // Clean up temp file
+    fs.unlinkSync(tempPath);
+
+    // Return as hex color
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  } catch (error) {
+    throw new Error(`Failed to extract dominant color: ${error.message}`);
+  }
+}
+
+/**
+ * Generate preview MP4 with fast start for progressive playback
+ */
+async function generatePreviewMP4(videoPath, outputPath) {
   const escapedVideoPath = videoPath.replace(/'/g, "'\\''");
   const escapedOutputPath = outputPath.replace(/'/g, "'\\''");
-  const command = `ffmpeg -i '${escapedVideoPath}' -vf "select=eq(n\\,0),scale=20:13" -frames:v 1 -f image2 -q:v 5 '${escapedOutputPath}'`;
+
+  // Generate 480p MP4 with fast start (moov atom at beginning for streaming)
+  // -movflags +faststart: moves metadata to beginning for progressive playback
+  // -preset fast: faster encoding
+  // -crf 23: good quality/size balance
+  const command = `ffmpeg -i '${escapedVideoPath}' -vf scale=854:480:force_original_aspect_ratio=decrease,pad=854:480:(ow-iw)/2:(oh-ih)/2 -c:v libx264 -preset fast -crf 23 -movflags +faststart -c:a aac -b:a 128k -r 30 '${escapedOutputPath}'`;
 
   try {
     await execPromise(command);
     return outputPath;
   } catch (error) {
-    throw new Error(`Failed to extract placeholder: ${error.message}`);
+    throw new Error(`Failed to generate preview MP4: ${error.message}`);
   }
-}
-
-/**
- * Convert image to base64 data URL
- */
-function imageToBase64(imagePath) {
-  const imageBuffer = fs.readFileSync(imagePath);
-  return `data:image/jpeg;base64,${imageBuffer.toString('base64')}`;
 }
 
 /**
@@ -160,12 +193,16 @@ async function processVideo(videoPath, data) {
     console.log(`  📊 Extracting metadata...`);
     const metadata = await getVideoMetadata(videoPath);
 
-    // Extract placeholder image
-    console.log(`  🖼️  Generating placeholder (20x13px)...`);
-    const placeholderPath = path.join(UPLOADS_DIR, `${checksum}.jpg`);
-    await extractPlaceholder(videoPath, placeholderPath);
-    const placeholder = imageToBase64(placeholderPath);
-    fs.unlinkSync(placeholderPath); // Clean up temp file
+    // Extract dominant color
+    console.log(`  🎨 Extracting dominant color...`);
+    const placeholder = await extractDominantColor(videoPath);
+
+    // Generate preview MP4 with fast start
+    console.log(`  🎥 Generating preview MP4 (480p, fast start)...`);
+    const previewFilename = `${checksum}.mp4`;
+    const previewPath = path.join(PREVIEWS_DIR, previewFilename);
+    await generatePreviewMP4(videoPath, previewPath);
+    const previewUrl = `/previews/${previewFilename}`;
 
     // Upload to Mux
     const muxData = await uploadToMux(videoPath, metadata);
@@ -182,6 +219,7 @@ async function processVideo(videoPath, data) {
       muxAssetId: muxData.assetId,
       muxUploadId: muxData.uploadId,
       playbackId: null, // Will be populated once Mux processes
+      previewUrl, // Fast-start MP4 for instant playback
       placeholder,
       checksum,
       sourceFile: filename,

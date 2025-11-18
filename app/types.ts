@@ -4,6 +4,7 @@ export interface Video {
   muxAssetId: string;
   muxUploadId: string;
   playbackId: string | null;
+  previewUrl?: string; // Fast-start MP4 for instant playback
   placeholder: string;
   checksum: string;
   sourceFile: string;

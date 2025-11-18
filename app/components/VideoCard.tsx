@@ -1,106 +1,100 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Hls from 'hls.js';
+import MuxPlayer from '@mux/mux-player-react';
 import type { Video } from '../types';
 
 interface VideoCardProps {
   video: Video;
+  index: number;
 }
 
-export function VideoCard({ video }: VideoCardProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
+export function VideoCard({ video, index }: VideoCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  const [isInView, setIsInView] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const loadStartTimeRef = useRef<number | null>(null);
 
-  // Get Mux URLs
-  const thumbnailUrl = video.playbackId
-    ? `https://image.mux.com/${video.playbackId}/thumbnail.jpg?width=640&height=360&fit_mode=smartcrop`
-    : null;
-
-  // Use Mux HLS stream for preview (works everywhere, adaptive quality)
-  const videoUrl = video.playbackId
-    ? `https://stream.mux.com/${video.playbackId}.m3u8`
-    : null;
-
-  // Initialize HLS player
+  // Detect when in viewport - with staggered delay
   useEffect(() => {
-    if (!videoRef.current || !videoUrl) return;
+    if (!containerRef.current) return;
 
-    const video = videoRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // First video loads immediately, others have staggered delay
+            const delay = index === 0 ? 0 : index * 100;
+            setTimeout(() => {
+              // Track load start time (localhost only)
+              if (process.env.NODE_ENV === 'development') {
+                loadStartTimeRef.current = performance.now();
+              }
+              setIsInView(true);
+            }, delay);
+            observer.disconnect();
+          }
+        });
+      },
+      { rootMargin: '300px' } // Preload before entering viewport
+    );
 
-    // Check if HLS is natively supported (Safari)
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = videoUrl;
-    } else if (Hls.isSupported()) {
-      // Use hls.js for other browsers
-      const hls = new Hls({
-        maxBufferLength: 10, // Lower buffer for faster start
-        maxMaxBufferLength: 15,
-      });
+    observer.observe(containerRef.current);
 
-      hls.loadSource(videoUrl);
-      hls.attachMedia(video);
+    return () => observer.disconnect();
+  }, [index]);
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log('HLS manifest parsed');
-      });
+  // Handle video playing - track load time
+  const handlePlaying = () => {
+    setIsPlaying(true);
 
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        console.error('HLS error:', data);
-      });
-
-      hlsRef.current = hls;
-
-      return () => {
-        hls.destroy();
-      };
+    // Log load time (localhost only)
+    if (process.env.NODE_ENV === 'development' && loadStartTimeRef.current !== null) {
+      const loadTime = Math.round(performance.now() - loadStartTimeRef.current);
+      console.log(`📹 Video loaded: "${video.title}" - ${loadTime}ms`);
+      loadStartTimeRef.current = null;
     }
-  }, [videoUrl]);
-
-  // No hover control - video autoplays with autoPlay attribute
+  };
 
   return (
     <div
+      ref={containerRef}
       className="group relative aspect-video overflow-hidden rounded-lg bg-gray-100 cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Instant: Dominant color placeholder (base64) */}
-      <img
-        src={video.placeholder}
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'blur(20px)', transform: 'scale(1.2)' }}
-        alt=""
+      {/* Instant: Dominant color background */}
+      <div
+        className="absolute inset-0 w-full h-full"
+        style={{ backgroundColor: video.placeholder }}
       />
 
-      {video.playbackId && (
-        <>
-          {/* Static thumbnail - shows while video is loading */}
-          {thumbnailUrl && (
-            <img
-              src={thumbnailUrl}
-              alt={video.title}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ${
-                isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-xl'
-              }`}
-              onLoad={() => setIsLoaded(true)}
-            />
-          )}
-
-          {/* Video preview - autoplays when loaded */}
-          {videoUrl && (
-            <video
-              ref={videoRef}
-              className="absolute inset-0 w-full h-full object-cover"
-              loop
-              muted
-              playsInline
-              autoPlay
-            />
-          )}
-        </>
+      {/* Mux Player - optimized HLS streaming */}
+      {video.playbackId && isInView && (
+        <div className={`absolute inset-0 w-full h-full transition-all duration-500 ${
+          isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-[1.1]'
+        }`}>
+          <MuxPlayer
+            playbackId={video.playbackId}
+            streamType="on-demand"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            startTime={0}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              '--controls': 'none',
+              '--media-object-fit': 'cover',
+              '--media-object-position': 'center',
+            } as any}
+            onPlaying={handlePlaying}
+          />
+        </div>
       )}
 
       {/* Status badge for non-ready videos */}
