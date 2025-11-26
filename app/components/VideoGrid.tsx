@@ -3,7 +3,7 @@ import { VideoCard } from './VideoCard';
 
 interface VideoGridProps {
   videos: Video[];
-  firstCellRef?: React.RefObject<HTMLDivElement>;
+  firstCellRef?: React.RefObject<HTMLDivElement | null>;
   hideFirstVideo?: boolean;
 }
 

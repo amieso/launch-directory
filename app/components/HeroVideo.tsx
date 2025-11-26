@@ -6,7 +6,7 @@ import type { Video } from '../types';
 
 interface HeroVideoProps {
   video: Video;
-  gridCellRef: React.RefObject<HTMLDivElement>;
+  gridCellRef: React.RefObject<HTMLDivElement | null>;
   onVisibilityChange?: (isVisible: boolean) => void;
 }
 
