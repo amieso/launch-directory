@@ -3,9 +3,11 @@ import { VideoCard } from './VideoCard';
 
 interface VideoGridProps {
   videos: Video[];
+  firstCellRef?: React.RefObject<HTMLDivElement>;
+  hideFirstVideo?: boolean;
 }
 
-export function VideoGrid({ videos }: VideoGridProps) {
+export function VideoGrid({ videos, firstCellRef, hideFirstVideo = false }: VideoGridProps) {
   if (videos.length === 0) {
     return (
       <div className="text-center py-20">
@@ -17,10 +19,31 @@ export function VideoGrid({ videos }: VideoGridProps) {
     );
   }
 
+  // Calculate empty cells needed to fill the grid
+  // We'll aim for many rows to extend gridlines down the entire page
+  const minCells = 100; // Extend grid significantly to fill page height
+  const emptyCellsNeeded = Math.max(0, minCells - videos.length);
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-l border-t border-gray-200">
       {videos.map((video, index) => (
-        <VideoCard key={video.id} video={video} index={index} />
+        <div
+          key={video.id}
+          ref={index === 0 ? firstCellRef : undefined}
+          style={{
+            opacity: index === 0 && hideFirstVideo ? 0 : 1,
+            transition: 'opacity 0.3s ease',
+          }}
+        >
+          <VideoCard video={video} index={index} />
+        </div>
+      ))}
+      {/* Empty cells to extend gridlines */}
+      {Array.from({ length: emptyCellsNeeded }).map((_, index) => (
+        <div
+          key={`empty-${index}`}
+          className="aspect-video border-r border-b border-gray-200 bg-gray-50"
+        />
       ))}
     </div>
   );
