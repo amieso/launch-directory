@@ -44,3 +44,6 @@ uploads/
 
 # preview videos
 /public/previews/
+
+# source URL mapping (generated during download)
+../.source-urls.json

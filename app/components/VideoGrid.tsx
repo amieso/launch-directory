@@ -3,11 +3,9 @@ import { VideoCard } from './VideoCard';
 
 interface VideoGridProps {
   videos: Video[];
-  firstCellRef?: React.RefObject<HTMLDivElement | null>;
-  hideFirstVideo?: boolean;
 }
 
-export function VideoGrid({ videos, firstCellRef, hideFirstVideo = false }: VideoGridProps) {
+export function VideoGrid({ videos }: VideoGridProps) {
   if (videos.length === 0) {
     return (
       <div className="text-center py-20">
@@ -27,16 +25,7 @@ export function VideoGrid({ videos, firstCellRef, hideFirstVideo = false }: Vide
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-l border-t border-gray-200">
       {videos.map((video, index) => (
-        <div
-          key={video.id}
-          ref={index === 0 ? firstCellRef : undefined}
-          style={{
-            opacity: index === 0 && hideFirstVideo ? 0 : 1,
-            transition: 'opacity 0.3s ease',
-          }}
-        >
-          <VideoCard video={video} index={index} />
-        </div>
+        <VideoCard key={video.id} video={video} index={index} />
       ))}
       {/* Empty cells to extend gridlines */}
       {Array.from({ length: emptyCellsNeeded }).map((_, index) => (

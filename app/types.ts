@@ -8,6 +8,8 @@ export interface Video {
   placeholder: string;
   checksum: string;
   sourceFile: string;
+  sourceUrl?: string | null; // Original post URL (YouTube/Twitter)
+  sourcePlatform?: string | null; // Platform (youtube/twitter)
   duration: number;
   width: number;
   height: number;

@@ -221,6 +221,31 @@ function logDownload(results) {
 }
 
 /**
+ * Save source URL mapping for processing
+ */
+function saveSourceUrlMapping(results) {
+  const mappingFile = path.join(UPLOADS_DIR, '.source-urls.json');
+  let mapping = {};
+
+  if (fs.existsSync(mappingFile)) {
+    mapping = JSON.parse(fs.readFileSync(mappingFile, 'utf-8'));
+  }
+
+  // Map filename to source URL
+  results.forEach(result => {
+    if (result) {
+      mapping[result.filename] = {
+        url: result.url,
+        platform: result.platform,
+        downloadedAt: result.downloadedAt,
+      };
+    }
+  });
+
+  fs.writeFileSync(mappingFile, JSON.stringify(mapping, null, 2));
+}
+
+/**
  * Main function
  */
 async function main() {
@@ -288,9 +313,10 @@ async function main() {
   console.log(`   Downloaded: ${results.length}`);
   console.log(`   Failed: ${filteredUrls.length - results.length}`);
 
-  // Log download history
+  // Log download history and save source URL mapping
   if (results.length > 0) {
     logDownload(results);
+    saveSourceUrlMapping(results);
     console.log(`\n✅ Download history saved`);
   }
 

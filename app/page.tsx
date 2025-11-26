@@ -1,36 +1,15 @@
-'use client';
-
-import { useRef, useState } from 'react';
 import { VideoGrid } from './components/VideoGrid';
-import { HeroVideo } from './components/HeroVideo';
 import Beach from './components/Beach';
 import type { VideoData } from './types';
 import videosData from './videos.json';
 
 export default function Home() {
   const data = videosData as VideoData;
-  const firstGridCellRef = useRef<HTMLDivElement>(null);
-  const [heroIsVisible, setHeroIsVisible] = useState(true);
-
-  // Get the first ready video for hero
-  const heroVideo = data.videos.find(v => v.status === 'ready' && v.playbackId);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero video - morphs to track first grid cell on scroll */}
-      {heroVideo && (
-        <HeroVideo
-          video={heroVideo}
-          gridCellRef={firstGridCellRef}
-          onVisibilityChange={setHeroIsVisible}
-        />
-      )}
-
-      {/* Spacer to push content below hero video */}
-      <div style={{ height: '100vh' }} />
-
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white/95 backdrop-blur-sm sticky top-0 z-40">
+      <header className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <h1 className="text-3xl font-bold text-gray-900">
             lowkey
@@ -54,11 +33,7 @@ export default function Home() {
         </div>
 
         {/* Video grid - full width */}
-        <VideoGrid
-          videos={data.videos}
-          firstCellRef={firstGridCellRef}
-          hideFirstVideo={heroIsVisible}
-        />
+        <VideoGrid videos={data.videos} />
       </main>
 
       {/* Footer */}

@@ -23,10 +23,21 @@ const DUPLICATES_DIR = path.join(UPLOADS_DIR, 'duplicates');
 const FAILED_DIR = path.join(UPLOADS_DIR, 'failed');
 const PREVIEWS_DIR = path.join(projectRoot, 'public', 'previews');
 const DATA_FILE = path.join(projectRoot, 'app', 'videos.json');
+const SOURCE_URLS_FILE = path.join(UPLOADS_DIR, '.source-urls.json');
 
 // Create previews directory if it doesn't exist
 if (!fs.existsSync(PREVIEWS_DIR)) {
   fs.mkdirSync(PREVIEWS_DIR, { recursive: true });
+}
+
+/**
+ * Load source URL mapping
+ */
+function loadSourceUrlMapping() {
+  if (fs.existsSync(SOURCE_URLS_FILE)) {
+    return JSON.parse(fs.readFileSync(SOURCE_URLS_FILE, 'utf-8'));
+  }
+  return {};
 }
 
 // Command line args
@@ -165,7 +176,7 @@ async function uploadToMux(videoPath, metadata) {
 /**
  * Process a single video file
  */
-async function processVideo(videoPath, data) {
+async function processVideo(videoPath, data, sourceUrlMapping) {
   const filename = path.basename(videoPath);
   console.log(`\n🎬 Processing: ${filename}`);
 
@@ -212,6 +223,9 @@ async function processVideo(videoPath, data) {
       .replace(/[-_]/g, ' ')
       .replace(/\b\w/g, l => l.toUpperCase());
 
+    // Get source URL from mapping if available
+    const sourceInfo = sourceUrlMapping[filename];
+
     // Create video entry
     const videoEntry = {
       id: muxData.assetId || muxData.uploadId, // Use uploadId as fallback
@@ -223,6 +237,8 @@ async function processVideo(videoPath, data) {
       placeholder,
       checksum,
       sourceFile: filename,
+      sourceUrl: sourceInfo?.url || null, // Source post URL (YouTube/Twitter)
+      sourcePlatform: sourceInfo?.platform || null,
       duration: metadata.duration,
       width: metadata.width,
       height: metadata.height,
@@ -365,6 +381,9 @@ async function main() {
     data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
   }
 
+  // Load source URL mapping
+  const sourceUrlMapping = loadSourceUrlMapping();
+
   // Get all video files in uploads directory
   const files = fs.readdirSync(UPLOADS_DIR)
     .filter(f => {
@@ -385,7 +404,7 @@ async function main() {
   // Process videos sequentially (can be parallelized later)
   const results = [];
   for (const videoPath of files) {
-    const result = await processVideo(videoPath, data);
+    const result = await processVideo(videoPath, data, sourceUrlMapping);
     if (result) {
       results.push(result);
     }
