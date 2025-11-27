@@ -1,5 +1,6 @@
 import { VideoGrid } from './components/VideoGrid';
 import Beach from './components/Beach';
+import SubscribeForm from './components/SubscribeForm';
 import type { VideoData } from './types';
 import videosData from './videos.json';
 
@@ -11,12 +12,19 @@ export default function Home() {
       {/* Header */}
       <header className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            lowkey
-          </h1>
-          <p className="text-gray-600 mt-2">
-            A curated collection of product launch videos
-          </p>
+          <div className="flex items-start justify-between gap-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                lowkey
+              </h1>
+              <p className="text-gray-600 mt-2">
+                A curated collection of product launch videos
+              </p>
+            </div>
+            
+            {/* Subscribe Form */}
+            <SubscribeForm />
+          </div>
         </div>
       </header>
 

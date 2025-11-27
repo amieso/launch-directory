@@ -35,6 +35,7 @@ export function VideoGrid({ videos }: VideoGridProps) {
           video={video} 
           index={index}
           isExpanded={expandedVideoId === video.id}
+          hasExpandedVideo={expandedVideoId !== null}
           onVideoClick={() => setExpandedVideoId(video.id)}
           onClose={() => setExpandedVideoId(null)}
         />

@@ -8,11 +8,12 @@ interface VideoCardProps {
   video: Video;
   index: number;
   isExpanded?: boolean;
+  hasExpandedVideo?: boolean;
   onVideoClick?: () => void;
   onClose?: () => void;
 }
 
-export function VideoCard({ video, index, isExpanded = false, onVideoClick, onClose }: VideoCardProps) {
+export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo = false, onVideoClick, onClose }: VideoCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -21,6 +22,7 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const scrollAccumulatorRef = useRef<number>(0);
+  const scrollPositionRef = useRef<number>(0);
 
   // Detect when in viewport - with staggered delay
   useEffect(() => {
@@ -146,18 +148,29 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
   // Separate effect for body scroll blocking - controlled by isAnimating to persist during close animation
   useEffect(() => {
     if (isAnimating) {
+      // Save current scroll position
+      scrollPositionRef.current = window.scrollY;
+      
+      // Apply fixed positioning with negative top to maintain visual position
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPositionRef.current}px`;
       document.body.style.width = '100%';
     } else {
+      // Restore scroll blocking styles
       document.body.style.overflow = 'unset';
       document.body.style.position = 'unset';
+      document.body.style.top = 'unset';
       document.body.style.width = 'unset';
+      
+      // Restore scroll position
+      window.scrollTo(0, scrollPositionRef.current);
     }
 
     return () => {
       document.body.style.overflow = 'unset';
       document.body.style.position = 'unset';
+      document.body.style.top = 'unset';
       document.body.style.width = 'unset';
     };
   }, [isAnimating]);
@@ -168,12 +181,32 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
     
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const targetWidth = viewportWidth * 0.8;
-    const targetHeight = viewportHeight * 0.8;
+    const maxWidth = viewportWidth * 0.8;
+    const maxHeight = viewportHeight * 0.8;
     
-    const scale = Math.min(targetWidth / rect.width, targetHeight / rect.height);
+    // Calculate final dimensions based on video's actual aspect ratio
+    const videoAspectRatio = video.width / video.height;
+    let finalWidth, finalHeight;
+    
+    if (maxWidth / maxHeight > videoAspectRatio) {
+      // Height is the limiting factor
+      finalHeight = maxHeight;
+      finalWidth = maxHeight * videoAspectRatio;
+    } else {
+      // Width is the limiting factor
+      finalWidth = maxWidth;
+      finalHeight = maxWidth / videoAspectRatio;
+    }
+    
+    // Calculate scale
+    const scale = finalWidth / rect.width;
+    
+    // Calculate the expanded container's height (after aspect ratio change but before scaling)
+    const expandedContainerHeight = rect.width / videoAspectRatio;
+    
+    // Calculate translation to center both horizontally and vertically
     const translateX = (viewportWidth / 2) - (rect.left + rect.width / 2);
-    const translateY = (viewportHeight / 2) - (rect.top + rect.height / 2);
+    const translateY = (viewportHeight / 2) - (rect.top + expandedContainerHeight / 2);
     
     return {
       transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
@@ -193,12 +226,15 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
       
       <div
         ref={containerRef}
-        className={`group relative aspect-video overflow-hidden bg-gray-100 cursor-pointer border-r border-b border-gray-200 transition-all duration-300 ease-out ${
+        className={`group relative overflow-hidden bg-gray-100 cursor-pointer transition-all duration-300 ease-inäout ${
           isAnimating ? 'fixed' : ''
-        }`}
+        } ${!isExpanded ? 'border-r border-b border-gray-200 aspect-video' : ''}`}
         style={{
+          ...(isExpanded && { aspectRatio: `${video.width} / ${video.height}` }),
           ...(isExpanded ? getTransform() : {}),
           ...(isAnimating ? { zIndex: 9999 } : {}),
+          // Scale down other videos when one is expanded
+          ...(!isExpanded && hasExpandedVideo ? { transform: 'scale(0.95)' } : {}),
         }}
         onMouseEnter={() => !isExpanded && setIsHovered(true)}
         onMouseLeave={() => !isExpanded && setIsHovered(false)}
@@ -224,15 +260,11 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
             playsInline
             preload="auto"
             startTime={0}
-            style={isExpanded ? {
+            style={{
               width: '100%',
               height: '100%',
-            } : {
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
               '--controls': 'none',
-              '--media-object-fit': 'cover',
+              '--media-object-fit': isExpanded ? 'contain' : 'cover',
               '--media-object-position': 'center',
             } as any}
             onPlaying={handlePlaying}
@@ -303,7 +335,7 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
 
       {/* Title overlay */}
       {!isExpanded && (
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-8 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-4 pt-8 opacity-0 group-hover:opacity-100 transition-opacity">
           <h3 className="text-white font-medium text-sm line-clamp-2">
             {video.title}
           </h3>
