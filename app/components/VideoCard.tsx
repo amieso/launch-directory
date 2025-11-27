@@ -20,6 +20,7 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
   const loadStartTimeRef = useRef<number | null>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const scrollAccumulatorRef = useRef<number>(0);
 
   // Detect when in viewport - with staggered delay
   useEffect(() => {
@@ -67,10 +68,10 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
     if (isExpanded) {
       setIsAnimating(true);
     } else if (isAnimating) {
-      // Keep z-index high during close animation
+      // Keep z-index and scroll block during close animation + extra buffer
       const timer = setTimeout(() => {
         setIsAnimating(false);
-      }, 300); // Match the animation duration
+      }, 550); // 300ms animation + 250ms buffer
       return () => clearTimeout(timer);
     }
   }, [isExpanded, isAnimating]);
@@ -84,7 +85,7 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
     }
   };
 
-  // Handle escape key
+  // Handle escape key, scroll blocking, and scroll-to-close
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isExpanded) {
@@ -92,18 +93,74 @@ export function VideoCard({ video, index, isExpanded = false, onVideoClick, onCl
       }
     };
 
+    // Prevent scroll on wheel events and accumulate scroll distance
+    const handleWheel = (e: WheelEvent) => {
+      // Block scroll during entire animation period
+      if (isAnimating) {
+        e.preventDefault();
+        
+        // Only allow closing if still expanded (not already closing)
+        if (isExpanded) {
+          // Accumulate scroll distance (only count downward scrolls)
+          if (e.deltaY > 0) {
+            scrollAccumulatorRef.current += e.deltaY;
+            
+            // Close if scrolled down more than 150px total
+            if (scrollAccumulatorRef.current > 150) {
+              onClose?.();
+              scrollAccumulatorRef.current = 0;
+            }
+          } else {
+            // Reset accumulator if scrolling up
+            scrollAccumulatorRef.current = 0;
+          }
+        }
+      }
+    };
+
+    // Prevent scroll on touch events (mobile)
+    const handleTouchMove = (e: TouchEvent) => {
+      // Block touch during entire animation period
+      if (isAnimating) {
+        e.preventDefault();
+      }
+    };
+
     if (isExpanded) {
+      scrollAccumulatorRef.current = 0; // Reset on open
+    }
+
+    if (isAnimating) {
       window.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      window.addEventListener('wheel', handleWheel, { passive: false });
+      window.addEventListener('touchmove', handleTouchMove, { passive: false });
     }
 
     return () => {
       window.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [isExpanded, onClose]);
+  }, [isExpanded, isAnimating, onClose]);
+
+  // Separate effect for body scroll blocking - controlled by isAnimating to persist during close animation
+  useEffect(() => {
+    if (isAnimating) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'unset';
+      document.body.style.width = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'unset';
+      document.body.style.width = 'unset';
+    };
+  }, [isAnimating]);
 
   // Calculate transform for expansion
   const getTransform = () => {
