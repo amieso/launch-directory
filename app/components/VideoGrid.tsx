@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import type { Video } from '../types';
 import { VideoCard } from './VideoCard';
 
@@ -6,6 +9,8 @@ interface VideoGridProps {
 }
 
 export function VideoGrid({ videos }: VideoGridProps) {
+  const [expandedVideoId, setExpandedVideoId] = useState<string | null>(null);
+
   if (videos.length === 0) {
     return (
       <div className="text-center py-20">
@@ -25,7 +30,14 @@ export function VideoGrid({ videos }: VideoGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-l border-t border-gray-200">
       {videos.map((video, index) => (
-        <VideoCard key={video.id} video={video} index={index} />
+        <VideoCard 
+          key={video.id} 
+          video={video} 
+          index={index}
+          isExpanded={expandedVideoId === video.id}
+          onVideoClick={() => setExpandedVideoId(video.id)}
+          onClose={() => setExpandedVideoId(null)}
+        />
       ))}
       {/* Empty cells to extend gridlines */}
       {Array.from({ length: emptyCellsNeeded }).map((_, index) => (

@@ -7,14 +7,19 @@ import type { Video } from '../types';
 interface VideoCardProps {
   video: Video;
   index: number;
+  isExpanded?: boolean;
+  onVideoClick?: () => void;
+  onClose?: () => void;
 }
 
-export function VideoCard({ video, index }: VideoCardProps) {
+export function VideoCard({ video, index, isExpanded = false, onVideoClick, onClose }: VideoCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const loadStartTimeRef = useRef<number | null>(null);
+  const [rect, setRect] = useState<DOMRect | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Detect when in viewport - with staggered delay
   useEffect(() => {
@@ -57,13 +62,91 @@ export function VideoCard({ video, index }: VideoCardProps) {
     }
   };
 
+  // Track animation state
+  useEffect(() => {
+    if (isExpanded) {
+      setIsAnimating(true);
+    } else if (isAnimating) {
+      // Keep z-index high during close animation
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 300); // Match the animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [isExpanded, isAnimating]);
+
+  // Handle click - capture position before expanding
+  const handleClick = () => {
+    if (containerRef.current && !isExpanded) {
+      const currentRect = containerRef.current.getBoundingClientRect();
+      setRect(currentRect);
+      onVideoClick?.();
+    }
+  };
+
+  // Handle escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isExpanded) {
+        onClose?.();
+      }
+    };
+
+    if (isExpanded) {
+      window.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isExpanded, onClose]);
+
+  // Calculate transform for expansion
+  const getTransform = () => {
+    if (!rect || !isExpanded) return {};
+    
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const targetWidth = viewportWidth * 0.8;
+    const targetHeight = viewportHeight * 0.8;
+    
+    const scale = Math.min(targetWidth / rect.width, targetHeight / rect.height);
+    const translateX = (viewportWidth / 2) - (rect.left + rect.width / 2);
+    const translateY = (viewportHeight / 2) - (rect.top + rect.height / 2);
+    
+    return {
+      transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+    };
+  };
+
   return (
-    <div
-      ref={containerRef}
-      className="group relative aspect-video overflow-hidden bg-gray-100 cursor-pointer border-r border-b border-gray-200"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <>
+      {/* Backdrop when expanded */}
+      {isExpanded && (
+        <div 
+          className="fixed inset-0 bg-black/80 transition-opacity duration-300"
+          style={{ zIndex: 9998 }}
+          onClick={onClose}
+        />
+      )}
+      
+      <div
+        ref={containerRef}
+        className={`group relative aspect-video overflow-hidden bg-gray-100 cursor-pointer border-r border-b border-gray-200 transition-all duration-300 ease-out ${
+          isAnimating ? 'fixed' : ''
+        }`}
+        style={{
+          ...(isExpanded ? getTransform() : {}),
+          ...(isAnimating ? { zIndex: 9999 } : {}),
+        }}
+        onMouseEnter={() => !isExpanded && setIsHovered(true)}
+        onMouseLeave={() => !isExpanded && setIsHovered(false)}
+        onClick={handleClick}
+      >
       {/* Instant: Dominant color background */}
       <div
         className="absolute inset-0 w-full h-full"
@@ -79,12 +162,15 @@ export function VideoCard({ video, index }: VideoCardProps) {
             playbackId={video.playbackId}
             streamType="on-demand"
             autoPlay
-            muted
-            loop
+            muted={!isExpanded}
+            loop={!isExpanded}
             playsInline
             preload="auto"
             startTime={0}
-            style={{
+            style={isExpanded ? {
+              width: '100%',
+              height: '100%',
+            } : {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
@@ -131,15 +217,45 @@ export function VideoCard({ video, index }: VideoCardProps) {
         </a>
       )}
 
+      {/* Close button when expanded */}
+      {isExpanded && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose?.();
+          }}
+          className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+          style={{ zIndex: 10000 }}
+          aria-label="Close"
+        >
+          <svg
+            className="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      )}
+
       {/* Title overlay */}
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-8 opacity-0 group-hover:opacity-100 transition-opacity">
-        <h3 className="text-white font-medium text-sm line-clamp-2">
-          {video.title}
-        </h3>
-        <p className="text-white/70 text-xs mt-1">
-          {Math.round(video.duration)}s
-        </p>
+      {!isExpanded && (
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-8 opacity-0 group-hover:opacity-100 transition-opacity">
+          <h3 className="text-white font-medium text-sm line-clamp-2">
+            {video.title}
+          </h3>
+          <p className="text-white/70 text-xs mt-1">
+            {Math.round(video.duration)}s
+          </p>
+        </div>
+      )}
       </div>
-    </div>
+    </>
   );
 }
