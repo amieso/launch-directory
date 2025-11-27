@@ -9,6 +9,28 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
+
+  /* Gray color scale - for amie-ui components */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-150: #ececec;
+  --color-gray-200: #e5e5e5;
+  --color-gray-600: #525252;
+  --color-gray-650: #4a4a4a;
+  --color-gray-700: #404040;
+  --color-gray-750: #3a3a3a;
+  --color-gray-800: #262626;
+  --color-gray-850: #1f1f1f;
+  --color-gray-900: #171717;
+
+  /* Animations - for amie-ui components */
+  --animate-shake: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
 }
 
 @media (prefers-color-scheme: dark) {

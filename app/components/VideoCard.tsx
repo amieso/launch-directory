@@ -17,12 +17,18 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
   const [isHovered, setIsHovered] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const loadStartTimeRef = useRef<number | null>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const scrollAccumulatorRef = useRef<number>(0);
   const scrollPositionRef = useRef<number>(0);
+  const [scrollOffset, setScrollOffset] = useState<number>(0);
+  const [scrollOffsetX, setScrollOffsetX] = useState<number>(0);
+  const scrollAccumulatorXRef = useRef<number>(0);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isBouncingBack, setIsBouncingBack] = useState(false);
 
   // Detect when in viewport - with staggered delay
   useEffect(() => {
@@ -56,12 +62,21 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
   // Handle video playing - track load time
   const handlePlaying = () => {
     setIsPlaying(true);
+    setHasError(false);
 
     // Log load time (localhost only)
     if (process.env.NODE_ENV === 'development' && loadStartTimeRef.current !== null) {
       const loadTime = Math.round(performance.now() - loadStartTimeRef.current);
       console.log(`📹 Video loaded: "${video.title}" - ${loadTime}ms`);
       loadStartTimeRef.current = null;
+    }
+  };
+
+  // Handle HLS/playback errors
+  const handleError = (error: any) => {
+    setHasError(true);
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`❌ Video error: "${video.title}"`, error);
     }
   };
 
@@ -103,18 +118,41 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
         
         // Only allow closing if still expanded (not already closing)
         if (isExpanded) {
-          // Accumulate scroll distance (only count downward scrolls)
-          if (e.deltaY > 0) {
-            scrollAccumulatorRef.current += e.deltaY;
-            
-            // Close if scrolled down more than 150px total
-            if (scrollAccumulatorRef.current > 150) {
-              onClose?.();
-              scrollAccumulatorRef.current = 0;
-            }
-          } else {
-            // Reset accumulator if scrolling up
+          // Clear any existing bounce-back timeout
+          if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+          }
+          setIsBouncingBack(false);
+          
+          // Accumulate vertical scroll distance (both up and down)
+          scrollAccumulatorRef.current += e.deltaY;
+          
+          // Accumulate horizontal scroll distance
+          scrollAccumulatorXRef.current += e.deltaX;
+          
+          // Update visual offsets (scroll distance / 10)
+          setScrollOffset(scrollAccumulatorRef.current / 10);
+          setScrollOffsetX(scrollAccumulatorXRef.current / 10);
+          
+          // Set timeout to bounce back horizontal offset when scrolling stops
+          scrollTimeoutRef.current = setTimeout(() => {
+            setIsBouncingBack(true);
+            scrollAccumulatorXRef.current = 0;
+            setScrollOffsetX(0);
+            // Reset bouncing flag after animation completes
+            setTimeout(() => setIsBouncingBack(false), 300);
+          }, 150);
+          
+          // Close if scrolled vertically in either direction more than 150px total
+          if (Math.abs(scrollAccumulatorRef.current) > 150) {
+            onClose?.();
             scrollAccumulatorRef.current = 0;
+            scrollAccumulatorXRef.current = 0;
+            setScrollOffset(0);
+            setScrollOffsetX(0);
+            if (scrollTimeoutRef.current) {
+              clearTimeout(scrollTimeoutRef.current);
+            }
           }
         }
       }
@@ -130,6 +168,13 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
 
     if (isExpanded) {
       scrollAccumulatorRef.current = 0; // Reset on open
+      scrollAccumulatorXRef.current = 0;
+      setScrollOffset(0);
+      setScrollOffsetX(0);
+      setIsBouncingBack(false);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     }
 
     if (isAnimating) {
@@ -142,6 +187,9 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
       window.removeEventListener('keydown', handleEscape);
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('touchmove', handleTouchMove);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
     };
   }, [isExpanded, isAnimating, onClose]);
 
@@ -205,8 +253,8 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
     const expandedContainerHeight = rect.width / videoAspectRatio;
     
     // Calculate translation to center both horizontally and vertically
-    const translateX = (viewportWidth / 2) - (rect.left + rect.width / 2);
-    const translateY = (viewportHeight / 2) - (rect.top + expandedContainerHeight / 2);
+    const translateX = (viewportWidth / 2) - (rect.left + rect.width / 2) + scrollOffsetX;
+    const translateY = (viewportHeight / 2) - (rect.top + expandedContainerHeight / 2) + scrollOffset;
     
     return {
       transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
@@ -235,6 +283,10 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
           ...(isAnimating ? { zIndex: 9999 } : {}),
           // Scale down other videos when one is expanded
           ...(!isExpanded && hasExpandedVideo ? { transform: 'scale(0.95)' } : {}),
+          // Add responsive transition for scroll offset feedback
+          ...(isExpanded && (scrollOffset !== 0 || scrollOffsetX !== 0) 
+            ? { transition: isBouncingBack ? 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'transform 0.1s ease-out' } 
+            : {}),
         }}
         onMouseEnter={() => !isExpanded && setIsHovered(true)}
         onMouseLeave={() => !isExpanded && setIsHovered(false)}
@@ -247,7 +299,7 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
       />
 
       {/* Mux Player - optimized HLS streaming */}
-      {video.playbackId && isInView && (
+      {video.playbackId && isInView && !hasError && (
         <div className={`absolute inset-0 w-full h-full transition-all duration-500 ${
           isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-[1.1]'
         }`}>
@@ -268,7 +320,17 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
               '--media-object-position': 'center',
             } as any}
             onPlaying={handlePlaying}
+            onError={handleError}
           />
+        </div>
+      )}
+
+      {/* Error state */}
+      {hasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <div className="text-center p-4">
+            <div className="text-gray-400 text-sm">Unable to load video</div>
+          </div>
         </div>
       )}
 
