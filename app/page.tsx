@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { VideoGrid } from './components/VideoGrid';
 import Beach from './components/Beach';
 import SubscribeForm from './components/SubscribeForm';
@@ -21,7 +22,7 @@ export default function Home() {
                 A curated collection of product launch videos
               </p>
             </div>
-            
+
             {/* Subscribe Form */}
             <SubscribeForm />
           </div>
@@ -41,7 +42,9 @@ export default function Home() {
         </div>
 
         {/* Video grid - full width */}
-        <VideoGrid videos={data.videos} />
+        <Suspense fallback={<div className="text-center py-20">Loading...</div>}>
+          <VideoGrid videos={data.videos} />
+        </Suspense>
       </main>
 
       {/* Footer */}
