@@ -131,6 +131,22 @@
       "size": 63782316,
       "uploadedAt": "2025-11-27T11:59:28.129Z",
       "status": "ready"
+    },
+    {
+      "id": "I4pPHg5pHkGAu7Lv4e43TXkgZAGXWGvdZPKY8wmnXYQ",
+      "title": "Ray   World'S First On Brand AI.  Introducing Bloom. 1995946169890111488",
+      "muxAssetId": "I4pPHg5pHkGAu7Lv4e43TXkgZAGXWGvdZPKY8wmnXYQ",
+      "muxUploadId": "k5djawbS1ZLUgsuHbig4YKh02s7ahWb6bts7P02t00X00pI",
+      "playbackId": "HyXSzBthLtb11fhC4d9G6ojCzfWebEumKnKWnqG1014c",
+      "placeholder": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAANAAtAAD//gAQTGF2YzYyLjExLjEwMAD/2wBDAAgKCgsKCw0NDQ0NDRAPEBAQEBAQEBAQEBASEhIVFRUSEhIQEBISFBQVFRcXFxUVFRUXFxkZGR4eHBwjIyQrKzP/xABTAAEBAQEBAAAAAAAAAAAAAAABAAIHAwEBAQAAAAAAAAAAAAAAAAAAAAEQAQEBAQAAAAAAAAAAAAAAAAABEhERAQEAAAAAAAAAAAAAAAAAAAAR/8AAEQgADQAUAwEiAAIRAAMRAP/aAAwDAQACEQMRAD8A78mNDQR6IS9KI//Z",
+      "checksum": "7d6a70cc4b521c08f312d39316cae8ad",
+      "sourceFile": "Ray - World's first on-brand AI.  Introducing Bloom.-1995946169890111488.mp4",
+      "duration": 58.986667,
+      "width": 1920,
+      "height": 1080,
+      "size": 11046825,
+      "uploadedAt": "2025-12-03T16:11:07.893Z",
+      "status": "ready"
     }
   ]
 }

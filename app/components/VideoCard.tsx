@@ -29,6 +29,7 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
   const scrollAccumulatorXRef = useRef<number>(0);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isBouncingBack, setIsBouncingBack] = useState(false);
+  const [shouldShowControls, setShouldShowControls] = useState(false);
 
   // Detect when in viewport - with staggered delay
   useEffect(() => {
@@ -101,6 +102,29 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
       onVideoClick?.();
     }
   };
+
+  // Capture rect when expanded from URL (no click happened)
+  useEffect(() => {
+    if (isExpanded && !rect && containerRef.current) {
+      const currentRect = containerRef.current.getBoundingClientRect();
+      setRect(currentRect);
+      // Force video to be in view when expanded from URL
+      setIsInView(true);
+    }
+  }, [isExpanded, rect]);
+
+  // Show controls when expanded (after animation starts)
+  useEffect(() => {
+    if (isExpanded) {
+      // Delay showing controls until after animation starts
+      const timer = setTimeout(() => {
+        setShouldShowControls(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setShouldShowControls(false);
+    }
+  }, [isExpanded]);
 
   // Handle escape key, scroll blocking, and scroll-to-close
   useEffect(() => {
@@ -306,8 +330,8 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
           <MuxPlayer
             playbackId={video.playbackId}
             streamType="on-demand"
-            autoPlay
-            muted={!isExpanded}
+            autoPlay={!isExpanded}
+            muted
             loop={!isExpanded}
             playsInline
             preload="auto"
@@ -315,7 +339,7 @@ export function VideoCard({ video, index, isExpanded = false, hasExpandedVideo =
             style={{
               width: '100%',
               height: '100%',
-              '--controls': 'none',
+              '--controls': shouldShowControls ? 'auto' : 'none',
               '--media-object-fit': isExpanded ? 'contain' : 'cover',
               '--media-object-position': 'center',
             } as any}

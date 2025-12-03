@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import type { Video } from '../types';
 import { VideoCard } from './VideoCard';
 
@@ -9,7 +10,35 @@ interface VideoGridProps {
 }
 
 export function VideoGrid({ videos }: VideoGridProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [expandedVideoId, setExpandedVideoId] = useState<string | null>(null);
+
+  // On mount, check URL for video ID and expand if present
+  useEffect(() => {
+    const videoIdFromUrl = searchParams.get('v');
+    if (videoIdFromUrl) {
+      // Verify the video ID exists in our videos list
+      const videoExists = videos.some(video => video.id === videoIdFromUrl);
+      if (videoExists) {
+        setExpandedVideoId(videoIdFromUrl);
+      }
+    }
+  }, [searchParams, videos]);
+
+  // Handle expanding a video - update URL
+  const handleVideoExpand = (videoId: string) => {
+    setExpandedVideoId(videoId);
+    // Update URL without page reload
+    router.push(`?v=${videoId}`, { scroll: false });
+  };
+
+  // Handle closing expanded video - remove from URL
+  const handleVideoClose = () => {
+    setExpandedVideoId(null);
+    // Remove query param from URL
+    router.push('/', { scroll: false });
+  };
 
   if (videos.length === 0) {
     return (
@@ -36,8 +65,8 @@ export function VideoGrid({ videos }: VideoGridProps) {
           index={index}
           isExpanded={expandedVideoId === video.id}
           hasExpandedVideo={expandedVideoId !== null}
-          onVideoClick={() => setExpandedVideoId(video.id)}
-          onClose={() => setExpandedVideoId(null)}
+          onVideoClick={() => handleVideoExpand(video.id)}
+          onClose={handleVideoClose}
         />
       ))}
       {/* Empty cells to extend gridlines */}
