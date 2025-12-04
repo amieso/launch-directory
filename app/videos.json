@@ -147,6 +147,38 @@
       "size": 11046825,
       "uploadedAt": "2025-12-03T16:11:07.893Z",
       "status": "ready"
+    },
+    {
+      "id": "8q3CY5ao1Fi801dGES00NayjSnPO02AP8UzAC02Y6Y3e6oI",
+      "title": "Aditya Verma   Time To Close All Your Tabs, Everything Is In Elevenlabs Now!! 1990473266247380992",
+      "muxAssetId": "8q3CY5ao1Fi801dGES00NayjSnPO02AP8UzAC02Y6Y3e6oI",
+      "muxUploadId": "iYcK7qlFgO1F026UxC00gmhb1INikHx00Q12R801mp6CahU",
+      "playbackId": "5uyi02Lr1fYxIbXZMFPss4ANKTTzXPwGCKXi00qxbqgv4",
+      "placeholder": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAANAAtAAD//gAQTGF2YzYyLjExLjEwMAD/2wBDAAgKCgsKCw0NDQ0NDRAPEBAQEBAQEBAQEBASEhIVFRUSEhIQEBISFBQVFRcXFxUVFRUXFxkZGR4eHBwjIyQrKzP/xABTAAEBAQAAAAAAAAAAAAAAAAAAAgcBAQEAAAAAAAAAAAAAAAAAAAABEAACAwEBAAAAAAAAAAAAAAAAAREhYTFREQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgADQAUAwEiAAIRAAMRAP/aAAwDAQACEQMRAD8A2clOZ7TatRzzNKBEAAB//9k=",
+      "checksum": "6c17e05614ad6db139e03b63e554a4c7",
+      "sourceFile": "Aditya Verma - Time to close all your tabs, Everything is in Elevenlabs now!!-1990473266247380992.mp4",
+      "duration": 48.170667,
+      "width": 1280,
+      "height": 720,
+      "size": 3437038,
+      "uploadedAt": "2025-12-04T18:36:56.683Z",
+      "status": "ready"
+    },
+    {
+      "id": "w5Dx14A2wlLDgTNItq4VJRFPpS7oWk4nJ94xwZC33pY",
+      "title": "Hassaan Raza   The Interface Of The Future Is Human.  We’Ve Raised A $40M Series B F... 1988663059985100801",
+      "muxAssetId": "w5Dx14A2wlLDgTNItq4VJRFPpS7oWk4nJ94xwZC33pY",
+      "muxUploadId": "qC8OwWMJgMCxGoGlZq02NkGOsf4GtgWYfZFLiZ024Jq9E",
+      "playbackId": "M4IAFnP02oAvXE5b01KHZzY00hDJjjLa4zqwmGh8Ry016JE",
+      "placeholder": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAANAAtAAD//gAQTGF2YzYyLjExLjEwMAD/2wBDAAgKCgsKCw0NDQ0NDRAPEBAQEBAQEBAQEBASEhIVFRUSEhIQEBISFBQVFRcXFxUVFRUXFxkZGR4eHBwjIyQrKzP/xABMAAEBAAAAAAAAAAAAAAAAAAAACAEBAQAAAAAAAAAAAAAAAAAAAAEQAQAAAAAAAAAAAAAAAAAAAAARAQAAAAAAAAAAAAAAAAAAAAD/wAARCAANABQDASIAAhEAAxEA/9oADAMBAAIRAxEAPwCfwEQAB//Z",
+      "checksum": "f1d1dc9876cca3a915289d9b1a52a1f5",
+      "sourceFile": "Hassaan Raza - The interface of the future is human.  We’ve raised a $40M Series B f...-1988663059985100801.mp4",
+      "duration": 210.688,
+      "width": 1920,
+      "height": 1080,
+      "size": 39300756,
+      "uploadedAt": "2025-12-04T18:40:55.211Z",
+      "status": "ready"
     }
   ]
 }
