@@ -23,7 +23,6 @@ const DUPLICATES_DIR = path.join(UPLOADS_DIR, 'duplicates');
 const FAILED_DIR = path.join(UPLOADS_DIR, 'failed');
 const PREVIEWS_DIR = path.join(projectRoot, 'public', 'previews');
 const DATA_FILE = path.join(projectRoot, 'app', 'videos.json');
-const SOURCE_URLS_FILE = path.join(UPLOADS_DIR, '.source-urls.json');
 
 // Create previews directory if it doesn't exist
 if (!fs.existsSync(PREVIEWS_DIR)) {
@@ -31,11 +30,24 @@ if (!fs.existsSync(PREVIEWS_DIR)) {
 }
 
 /**
- * Load source URL mapping
+ * Load source URL mapping from videos.json
  */
 function loadSourceUrlMapping() {
-  if (fs.existsSync(SOURCE_URLS_FILE)) {
-    return JSON.parse(fs.readFileSync(SOURCE_URLS_FILE, 'utf-8'));
+  if (fs.existsSync(DATA_FILE)) {
+    const videosData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+    const mapping = {};
+
+    // Build mapping from existing videos
+    videosData.videos.forEach(video => {
+      if (video.sourceFile && video.sourceUrl) {
+        mapping[video.sourceFile] = {
+          url: video.sourceUrl,
+          platform: video.sourcePlatform,
+        };
+      }
+    });
+
+    return mapping;
   }
   return {};
 }

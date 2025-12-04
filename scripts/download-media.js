@@ -19,6 +19,7 @@ const UPLOADS_DIR = path.join(projectRoot, '..', 'uploads');
 const YOUTUBE_DIR = path.join(UPLOADS_DIR, 'youtube');
 const TWITTER_DIR = path.join(UPLOADS_DIR, 'twitter');
 const LOGS_DIR = path.join(projectRoot, 'data');
+const VIDEOS_JSON = path.join(projectRoot, 'app', 'videos.json');
 
 // Command line args
 const urls = process.argv.slice(2);
@@ -221,28 +222,39 @@ function logDownload(results) {
 }
 
 /**
- * Save source URL mapping for processing
+ * Save source URL mapping directly to videos.json
  */
 function saveSourceUrlMapping(results) {
-  const mappingFile = path.join(UPLOADS_DIR, '.source-urls.json');
-  let mapping = {};
-
-  if (fs.existsSync(mappingFile)) {
-    mapping = JSON.parse(fs.readFileSync(mappingFile, 'utf-8'));
+  // Read existing videos.json
+  let videosData = { videos: [] };
+  if (fs.existsSync(VIDEOS_JSON)) {
+    videosData = JSON.parse(fs.readFileSync(VIDEOS_JSON, 'utf-8'));
   }
 
-  // Map filename to source URL
-  results.forEach(result => {
-    if (result) {
-      mapping[result.filename] = {
-        url: result.url,
-        platform: result.platform,
-        downloadedAt: result.downloadedAt,
-      };
+  // Create a map of existing videos by sourceFile for quick lookup
+  const existingVideosMap = new Map();
+  videosData.videos.forEach(video => {
+    if (video.sourceFile) {
+      existingVideosMap.set(video.sourceFile, video);
     }
   });
 
-  fs.writeFileSync(mappingFile, JSON.stringify(mapping, null, 2));
+  // Update source URLs for newly downloaded videos
+  results.forEach(result => {
+    if (result) {
+      const existingVideo = existingVideosMap.get(result.filename);
+      if (existingVideo) {
+        // Update existing video entry with source info
+        existingVideo.sourceUrl = result.url;
+        existingVideo.sourcePlatform = result.platform;
+      }
+      // Note: New videos will be added by process-videos.js with this info
+    }
+  });
+
+  // Write back to videos.json
+  fs.writeFileSync(VIDEOS_JSON, JSON.stringify(videosData, null, 2));
+  console.log(`\n✅ Updated source URLs in ${VIDEOS_JSON}`);
 }
 
 /**
