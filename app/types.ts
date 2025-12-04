@@ -4,6 +4,8 @@ export interface Video {
   muxAssetId: string;
   muxUploadId: string;
   playbackId: string | null;
+  bunnyVideoId?: string | null; // Bunny.net video ID
+  bunnyPlaybackUrl?: string | null; // Bunny.net HLS URL
   previewUrl?: string; // Fast-start MP4 for instant playback
   placeholder: string;
   checksum: string;

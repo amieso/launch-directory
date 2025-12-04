@@ -186,6 +186,76 @@ async function uploadToMux(videoPath, metadata) {
 }
 
 /**
+ * Upload video to Bunny.net Stream
+ */
+async function uploadToBunny(videoPath, title) {
+  if (!process.env.BUNNY_STREAM_API_KEY || !process.env.BUNNY_LIBRARY_ID) {
+    console.log(`  ⚠️  Bunny.net credentials not configured, skipping Bunny upload`);
+    return null;
+  }
+
+  console.log(`  📤 Uploading to Bunny.net...`);
+
+  try {
+    // Step 1: Create video object
+    const createResponse = await fetch(
+      `https://video.bunnycdn.com/library/${process.env.BUNNY_LIBRARY_ID}/videos`,
+      {
+        method: 'POST',
+        headers: {
+          'AccessKey': process.env.BUNNY_STREAM_API_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ title }),
+      }
+    );
+
+    if (!createResponse.ok) {
+      throw new Error(`Failed to create Bunny video object: ${createResponse.statusText}`);
+    }
+
+    const videoData = await createResponse.json();
+    const videoId = videoData.guid;
+
+    console.log(`  ✅ Created Bunny video object (ID: ${videoId})`);
+
+    // Step 2: Upload video file
+    const fileBuffer = fs.readFileSync(videoPath);
+
+    const uploadResponse = await fetch(
+      `https://video.bunnycdn.com/library/${process.env.BUNNY_LIBRARY_ID}/videos/${videoId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'AccessKey': process.env.BUNNY_STREAM_API_KEY,
+          'Accept': 'application/json',
+        },
+        body: fileBuffer,
+      }
+    );
+
+    if (!uploadResponse.ok) {
+      throw new Error(`Failed to upload to Bunny: ${uploadResponse.statusText}`);
+    }
+
+    console.log(`  ✅ Uploaded to Bunny.net`);
+
+    // Construct HLS playback URL
+    // Format: https://iframe.mediadelivery.net/embed/{libraryId}/{videoId}
+    const playbackUrl = `https://iframe.mediadelivery.net/play/${process.env.BUNNY_LIBRARY_ID}/${videoId}`;
+
+    return {
+      videoId,
+      playbackUrl,
+    };
+  } catch (error) {
+    console.error(`  ❌ Bunny upload failed: ${error.message}`);
+    return null;
+  }
+}
+
+/**
  * Process a single video file
  */
 async function processVideo(videoPath, data, sourceUrlMapping) {
@@ -227,13 +297,16 @@ async function processVideo(videoPath, data, sourceUrlMapping) {
     await generatePreviewMP4(videoPath, previewPath);
     const previewUrl = `/previews/${previewFilename}`;
 
-    // Upload to Mux
-    const muxData = await uploadToMux(videoPath, metadata);
-
     // Generate clean title from filename
     const title = path.parse(filename).name
       .replace(/[-_]/g, ' ')
       .replace(/\b\w/g, l => l.toUpperCase());
+
+    // Upload to Mux
+    const muxData = await uploadToMux(videoPath, metadata);
+
+    // Upload to Bunny.net (parallel with Mux for testing)
+    const bunnyData = await uploadToBunny(videoPath, title);
 
     // Get source URL from mapping if available
     const sourceInfo = sourceUrlMapping[filename];
@@ -244,6 +317,8 @@ async function processVideo(videoPath, data, sourceUrlMapping) {
       title,
       muxAssetId: muxData.assetId,
       muxUploadId: muxData.uploadId,
+      bunnyVideoId: bunnyData?.videoId || null,
+      bunnyPlaybackUrl: bunnyData?.playbackUrl || null,
       playbackId: null, // Will be populated once Mux processes
       previewUrl, // Fast-start MP4 for instant playback
       placeholder,
