@@ -191,10 +191,13 @@ async function uploadToMux(videoPath, metadata) {
 async function uploadToBunny(videoPath, title) {
   if (!process.env.BUNNY_STREAM_API_KEY || !process.env.BUNNY_LIBRARY_ID) {
     console.log(`  ⚠️  Bunny.net credentials not configured, skipping Bunny upload`);
+    console.log(`     BUNNY_STREAM_API_KEY: ${process.env.BUNNY_STREAM_API_KEY ? 'SET' : 'NOT SET'}`);
+    console.log(`     BUNNY_LIBRARY_ID: ${process.env.BUNNY_LIBRARY_ID ? 'SET' : 'NOT SET'}`);
     return null;
   }
 
   console.log(`  📤 Uploading to Bunny.net...`);
+  console.log(`     Library ID: ${process.env.BUNNY_LIBRARY_ID}`);
 
   try {
     // Step 1: Create video object
@@ -212,11 +215,16 @@ async function uploadToBunny(videoPath, title) {
     );
 
     if (!createResponse.ok) {
-      throw new Error(`Failed to create Bunny video object: ${createResponse.statusText}`);
+      const errorText = await createResponse.text();
+      throw new Error(`Failed to create Bunny video object: ${createResponse.status} ${createResponse.statusText} - ${errorText}`);
     }
 
     const videoData = await createResponse.json();
     const videoId = videoData.guid;
+
+    if (!videoId) {
+      throw new Error(`No video ID returned from Bunny. Response: ${JSON.stringify(videoData)}`);
+    }
 
     console.log(`  ✅ Created Bunny video object (ID: ${videoId})`);
 
