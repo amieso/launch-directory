@@ -4,13 +4,14 @@ import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { exec } from 'child_process';
+import { exec, execFile } from 'child_process';
 import { promisify } from 'util';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const execPromise = promisify(exec);
+const execFilePromise = promisify(execFile);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -75,14 +76,20 @@ function calculateChecksum(filePath) {
  */
 async function extractDominantColor(videoPath) {
   const tempPath = path.join(UPLOADS_DIR, `temp_${Date.now()}.rgb`);
-  const escapedVideoPath = videoPath.replace(/'/g, "'\\''");
-  const escapedTempPath = tempPath.replace(/'/g, "'\\''");
 
   // Extract first frame, scale to 1x1 pixel (averages all colors), output as raw RGB
-  const command = `ffmpeg -i '${escapedVideoPath}' -vf "select=eq(n\\,0),scale=1:1" -frames:v 1 -f rawvideo -pix_fmt rgb24 '${escapedTempPath}'`;
+  // Using execFile to avoid shell escaping issues with special characters
+  const args = [
+    '-i', videoPath,
+    '-vf', 'select=eq(n\\,0),scale=1:1',
+    '-frames:v', '1',
+    '-f', 'rawvideo',
+    '-pix_fmt', 'rgb24',
+    tempPath
+  ];
 
   try {
-    await execPromise(command);
+    await execFilePromise('ffmpeg', args);
 
     // Read the 3 bytes (RGB values)
     const buffer = fs.readFileSync(tempPath);
@@ -104,17 +111,26 @@ async function extractDominantColor(videoPath) {
  * Generate preview MP4 with fast start for progressive playback
  */
 async function generatePreviewMP4(videoPath, outputPath) {
-  const escapedVideoPath = videoPath.replace(/'/g, "'\\''");
-  const escapedOutputPath = outputPath.replace(/'/g, "'\\''");
-
   // Generate 480p MP4 with fast start (moov atom at beginning for streaming)
   // -movflags +faststart: moves metadata to beginning for progressive playback
   // -preset fast: faster encoding
   // -crf 23: good quality/size balance
-  const command = `ffmpeg -i '${escapedVideoPath}' -vf scale=854:480:force_original_aspect_ratio=decrease,pad=854:480:(ow-iw)/2:(oh-ih)/2 -c:v libx264 -preset fast -crf 23 -movflags +faststart -c:a aac -b:a 128k -r 30 '${escapedOutputPath}'`;
+  // Using execFile to avoid shell escaping issues with special characters
+  const args = [
+    '-i', videoPath,
+    '-vf', 'scale=854:480:force_original_aspect_ratio=decrease,pad=854:480:(ow-iw)/2:(oh-ih)/2',
+    '-c:v', 'libx264',
+    '-preset', 'fast',
+    '-crf', '23',
+    '-movflags', '+faststart',
+    '-c:a', 'aac',
+    '-b:a', '128k',
+    '-r', '30',
+    outputPath
+  ];
 
   try {
-    await execPromise(command);
+    await execFilePromise('ffmpeg', args);
     return outputPath;
   } catch (error) {
     throw new Error(`Failed to generate preview MP4: ${error.message}`);
@@ -125,11 +141,17 @@ async function generatePreviewMP4(videoPath, outputPath) {
  * Get video metadata using ffprobe
  */
 async function getVideoMetadata(videoPath) {
-  const escapedPath = videoPath.replace(/'/g, "'\\''");
-  const command = `ffprobe -v quiet -print_format json -show_format -show_streams '${escapedPath}'`;
+  // Using execFile to avoid shell escaping issues with special characters
+  const args = [
+    '-v', 'quiet',
+    '-print_format', 'json',
+    '-show_format',
+    '-show_streams',
+    videoPath
+  ];
 
   try {
-    const { stdout } = await execPromise(command);
+    const { stdout } = await execFilePromise('ffprobe', args);
     const metadata = JSON.parse(stdout);
     const videoStream = metadata.streams.find(s => s.codec_type === 'video');
 
@@ -189,6 +211,7 @@ async function uploadToMux(videoPath, metadata) {
  * Upload video to Bunny.net Stream
  */
 async function uploadToBunny(videoPath, title) {
+  console.log(`  🐰 BUNNY FUNCTION CALLED! videoPath: ${videoPath}, title: ${title}`);
   if (!process.env.BUNNY_STREAM_API_KEY || !process.env.BUNNY_LIBRARY_ID) {
     console.log(`  ⚠️  Bunny.net credentials not configured, skipping Bunny upload`);
     console.log(`     BUNNY_STREAM_API_KEY: ${process.env.BUNNY_STREAM_API_KEY ? 'SET' : 'NOT SET'}`);
