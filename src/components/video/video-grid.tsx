@@ -49,7 +49,7 @@ export function VideoGrid({ videos, isLoading, columns = 4 }: VideoGridProps) {
   return (
     <>
       <div
-        className="grid gap-x-6 gap-y-3"
+        className="grid gap-x-6 gap-y-4"
         style={getGridStyle(columns)}
       >
         {videos.map((video) => (

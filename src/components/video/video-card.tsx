@@ -19,8 +19,11 @@ interface VideoCardProps {
 
 export function VideoCard({ video, onSelect }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const isGhost = !video.videoUrl
 
   useEffect(() => {
+    if (isGhost) return
+
     const videoEl = videoRef.current
     if (!videoEl) return
 
@@ -37,14 +40,16 @@ export function VideoCard({ video, onSelect }: VideoCardProps) {
       videoEl.src = video.videoUrl
       videoEl.play().catch(() => {})
     }
-  }, [video.videoUrl])
+  }, [video.videoUrl, isGhost])
 
   const handleClick = () => {
-    onSelect(video)
+    if (!isGhost) {
+      onSelect(video)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if ((e.key === 'Enter' || e.key === ' ') && !isGhost) {
       e.preventDefault()
       onSelect(video)
     }
@@ -52,22 +57,27 @@ export function VideoCard({ video, onSelect }: VideoCardProps) {
 
   return (
     <article
-      role="button"
-      tabIndex={0}
+      role={isGhost ? undefined : 'button'}
+      tabIndex={isGhost ? undefined : 0}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className="group cursor-pointer"
+      className={`group ${isGhost ? '' : 'cursor-pointer'}`}
     >
       {/* Video container - always 16:9 */}
       <div className="relative aspect-video w-full rounded-[6px] group-hover:ring-1 group-hover:ring-white/[0.08]">
         <div className="absolute inset-0 overflow-hidden rounded-[6px] bg-surface isolate">
-          <video
-          ref={videoRef}
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover rounded-[6px]"
-        />
+          {isGhost ? (
+            // Ghost card placeholder
+            <div className="absolute inset-0 bg-[#1a1a1a]" />
+          ) : (
+            <video
+              ref={videoRef}
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 h-full w-full object-cover rounded-[6px]"
+            />
+          )}
 
           {/* Dark overlay with info on hover */}
           <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-5 pointer-events-none">
@@ -87,12 +97,16 @@ export function VideoCard({ video, onSelect }: VideoCardProps) {
       </div>
 
       {/* Info below card */}
-      <div className="flex items-center justify-between pt-2.5 pb-1.5">
+      <div className="flex items-center justify-between pt-[14px] pb-1.5">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-xs text-muted shrink-0">{video.company}</span>
           <span className="text-xs text-foreground truncate">{video.title}</span>
         </div>
-        <span className="text-xs text-muted shrink-0 font-mono">{formatDuration(video.duration)}</span>
+        {isGhost ? (
+          <span className="text-xs text-muted shrink-0 font-mono">Soon</span>
+        ) : (
+          <span className="text-xs text-muted shrink-0 font-mono">{formatDuration(video.duration)}</span>
+        )}
       </div>
     </article>
   )
