@@ -10,7 +10,7 @@ export function Footer() {
             © 2026 Lowkey
           </span>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             <Link
               href="/terms"
               className="text-xs text-muted hover:text-foreground transition-colors"
