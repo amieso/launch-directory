@@ -15,14 +15,15 @@ function toProperCase(str: string): string {
 interface VideoCardProps {
   video: Video
   onSelect: (video: Video) => void
+  disablePlayback?: boolean
 }
 
-export function VideoCard({ video, onSelect }: VideoCardProps) {
+export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const isGhost = !video.videoUrl
 
   useEffect(() => {
-    if (isGhost) return
+    if (isGhost || disablePlayback) return
 
     const videoEl = videoRef.current
     if (!videoEl) return
@@ -40,7 +41,7 @@ export function VideoCard({ video, onSelect }: VideoCardProps) {
       videoEl.src = video.videoUrl
       videoEl.play().catch(() => {})
     }
-  }, [video.videoUrl, isGhost])
+  }, [video.videoUrl, isGhost, disablePlayback])
 
   const handleClick = () => {
     if (!isGhost) {
@@ -69,6 +70,13 @@ export function VideoCard({ video, onSelect }: VideoCardProps) {
           {isGhost ? (
             // Ghost card placeholder
             <div className="absolute inset-0 bg-[#1a1a1a]" />
+          ) : disablePlayback ? (
+            // Static thumbnail for locked cards
+            <img
+              src={video.thumbnailUrl}
+              alt={video.title}
+              className="absolute inset-0 h-full w-full object-cover rounded-[6px]"
+            />
           ) : (
             <video
               ref={videoRef}

@@ -1,6 +1,12 @@
 export type VideoStyle = 'kinetic-text' | '3d' | 'motion-graphics' | 'product-demo' | 'mixed'
 export type ProductType = 'saas' | 'mobile-app' | 'consumer' | 'dev-tool' | 'other'
 
+export interface Chapter {
+  id: string
+  title: string
+  startTime: number // in seconds
+}
+
 export interface Credit {
   role: string
   name: string
@@ -26,6 +32,7 @@ export interface Video {
   credits: Credit[]
   featured: boolean
   publishedDate: string
+  chapters?: Chapter[]
 }
 
 export const STYLE_LABELS: Record<VideoStyle, string> = {

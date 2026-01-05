@@ -84,7 +84,7 @@ export function MorphText({ words, prefix, interval = 3000, className = '', stag
         className="inline-flex whitespace-nowrap items-baseline"
       >
         {prefix && <span>{prefix}&nbsp;</span>}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.span
             key={currentIndex}
             initial="hidden"

@@ -16,6 +16,7 @@ const config: Config = {
         muted: '#a3a3a3',
         'muted-dark': '#737373',
         accent: '#fafafa',
+        'modal-black': '#141414',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],

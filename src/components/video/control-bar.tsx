@@ -29,13 +29,13 @@ export function ControlBar({
   const hasActiveFilter = searchParams.get('style') !== null
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
       {/* Left: Filter Toggle + Search */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:flex-1 lg:flex-none">
         <button
           onClick={onFilterToggle}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors rounded-full border-2 w-[116px] justify-center',
+            'flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors rounded-full border-2 justify-center shrink-0 w-[120px]',
             isFilterOpen || hasActiveFilter
               ? 'text-foreground/60 border-foreground/60'
               : 'text-muted border-surface hover:text-foreground/60 hover:border-foreground/60'
@@ -47,7 +47,7 @@ export function ControlBar({
           )}
         </button>
 
-        <div className="relative">
+        <div className="relative flex-1 lg:flex-none">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-dark/50"
             fill="none"
@@ -66,7 +66,7 @@ export function ControlBar({
             placeholder="Search videos..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9 pr-8 py-1.5 text-sm bg-surface text-foreground placeholder:text-muted-dark/50 rounded-full border-2 border-surface transition-colors w-80 focus:outline-none focus:ring-0 focus:border-surface"
+            className="pl-9 pr-8 py-1.5 text-sm bg-surface text-foreground placeholder:text-muted-dark/50 rounded-full border-2 border-surface transition-colors w-full lg:w-80 focus:outline-none focus:ring-0 focus:border-surface"
           />
           {searchQuery && (
             <button
@@ -81,13 +81,15 @@ export function ControlBar({
         </div>
       </div>
 
-      {/* Right: Grid Size Controls */}
-      <GridSizeControls
-        onIncrease={onGridIncrease}
-        onDecrease={onGridDecrease}
-        canIncrease={canGridIncrease}
-        canDecrease={canGridDecrease}
-      />
+      {/* Right: Grid Size Controls (hidden below lg) */}
+      <div className="hidden lg:block">
+        <GridSizeControls
+          onIncrease={onGridIncrease}
+          onDecrease={onGridDecrease}
+          canIncrease={canGridIncrease}
+          canDecrease={canGridDecrease}
+        />
+      </div>
     </div>
   )
 }

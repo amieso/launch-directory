@@ -34,7 +34,7 @@ export function VideoSection({ videos }: VideoSectionProps) {
   })
 
   return (
-    <div className="px-6 mt-8">
+    <div className="px-4 md:px-6 mt-6 md:mt-8">
       {/* Control Bar Row */}
       <div className="py-2 mb-6">
         <Suspense fallback={<div className="h-6" />}>

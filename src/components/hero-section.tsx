@@ -5,7 +5,7 @@ const ROTATING_WORDS = ['launch video', 'product demo', 'announcement']
 
 export function HeroSection() {
   return (
-    <section className="px-6 py-20 md:py-32">
+    <section className="px-4 md:px-6 py-16 md:py-32">
       <div className="max-w-3xl mx-auto text-center">
         <p className="text-[12px] font-mono text-muted uppercase tracking-widest mb-7">
           From the makers of Amie
