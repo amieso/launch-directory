@@ -17,10 +17,11 @@ interface AuthContextType {
   authModalMode: 'login' | 'signup'
   authMessage: string | null
   savedVideoSlugs: string[]
+  isOnboardingOpen: boolean
   openAuthModal: (mode: 'login' | 'signup') => void
   closeAuthModal: () => void
   signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string, name?: string) => Promise<void>
+  signUp: (email: string, password: string, name?: string, avatarColor?: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   signInWithMagicLink: (email: string) => Promise<void>
   signOut: () => Promise<void>
@@ -30,6 +31,7 @@ interface AuthContextType {
   removeSavedVideo: (slug: string) => void
   clearAuthMessage: () => void
   setAuthMessage: (message: string | null) => void
+  completeOnboarding: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -86,6 +88,14 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
   const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
   const [authMessage, setAuthMessage] = useState<string | null>(null)
   const [savedVideoSlugs, setSavedVideoSlugs] = useState<string[]>([])
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false)
+
+  // Show onboarding if user is authenticated but has no name set
+  const needsOnboarding = authState === 'authenticated' && !!user?.profile && !user.profile.name && !onboardingCompleted
+
+  const completeOnboarding = useCallback(() => {
+    setOnboardingCompleted(true)
+  }, [])
 
   const refreshSavedVideos = useCallback(async (userId?: string) => {
     const id = userId || user?.id
@@ -137,61 +147,29 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    // Initial load - only run once on mount
-    const initAuth = async () => {
-      try {
-        // Race against timeout - don't let auth check hang forever
-        const timeoutPromise = new Promise<null>((resolve) => {
-          setTimeout(() => resolve(null), 3000) // 3 second timeout
-        })
-
-        const currentUser = await Promise.race([
-          authService.getUser(),
-          timeoutPromise
-        ])
-
-        setUser(currentUser)
-        if (currentUser?.id) {
-          setAuthState('authenticated')
-          // Fetch saved videos in background
-          collectionService.getCollections(currentUser.id).then(collections => {
-            const defaultCollection = collections.find(c => c.is_default)
-            if (defaultCollection) {
-              collectionService.getCollection(defaultCollection.id).then(fullCollection => {
-                if (fullCollection) {
-                  setSavedVideoSlugs(fullCollection.items.map(item => item.video_slug))
-                }
-              })
-            }
-          })
-        } else {
-          setAuthState('unauthenticated')
-        }
-      } catch (err) {
-        console.error('[AuthContext] initAuth error:', err)
-        setUser(null)
-        setAuthState('unauthenticated')
-      } finally {
-        isInitializedRef.current = true
-      }
-    }
-
-    initAuth()
-
-    // Listen for auth changes AFTER initial load
-    // This prevents the listener from overriding state during hydration
+    // Listen for auth changes - this is the primary source of truth
     const { data: { subscription } } = authService.onAuthStateChange((authUser) => {
-      // Only respond to auth changes after initialization is complete
-      // This prevents flash from listener firing before initAuth completes
+      console.log('[AuthContext] onAuthStateChange:', authUser?.email ?? 'null')
       setUser(authUser)
       if (authUser) {
         setAuthState('authenticated')
         setIsAuthModalOpen(false)
-      } else if (isInitializedRef.current) {
-        // Only set to unauthenticated if we're already initialized
-        // Otherwise, let initAuth handle it
+        // Fetch saved videos
+        collectionService.getCollections(authUser.id).then(collections => {
+          const defaultCollection = collections.find(c => c.is_default)
+          if (defaultCollection) {
+            collectionService.getCollection(defaultCollection.id).then(fullCollection => {
+              if (fullCollection) {
+                setSavedVideoSlugs(fullCollection.items.map(item => item.video_slug))
+              }
+            })
+          }
+        })
+      } else {
         setAuthState('unauthenticated')
+        setSavedVideoSlugs([])
       }
+      isInitializedRef.current = true
     })
 
     return () => {
@@ -214,8 +192,8 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
     closeAuthModal()
   }
 
-  const signUp = async (email: string, password: string, name?: string) => {
-    await authService.signUp({ email, password, name })
+  const signUp = async (email: string, password: string, name?: string, avatarColor?: string) => {
+    await authService.signUp({ email, password, name, avatarColor })
     // User may need to verify email, so don't close modal yet
   }
 
@@ -245,6 +223,7 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
         authModalMode,
         authMessage,
         savedVideoSlugs,
+        isOnboardingOpen: needsOnboarding,
         openAuthModal,
         closeAuthModal,
         signIn,
@@ -258,6 +237,7 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
         removeSavedVideo,
         clearAuthMessage,
         setAuthMessage,
+        completeOnboarding,
       }}
     >
       {children}

@@ -3,6 +3,7 @@
 import { useMemo, useRef, useEffect, useState } from 'react'
 import { Video } from '@/types/video'
 import { getSegmentsForVideo } from '@/data/segments'
+import { CompanyLink } from '@/components/ui/company-link'
 
 interface BreakdownModeProps {
   video: Video
@@ -54,9 +55,10 @@ export function BreakdownMode({ video, currentTime, onSeek }: BreakdownModeProps
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="shrink-0 pb-4">
-        <p className="text-xs text-muted font-mono uppercase tracking-widest mb-2.5">
-          {video.company}
-        </p>
+        <CompanyLink
+          company={video.company}
+          className="text-xs text-muted font-mono uppercase tracking-widest mb-2.5 hover:text-foreground transition-colors inline-block"
+        />
         <h2 className="text-xl font-medium text-foreground leading-tight tracking-tight">
           Video Breakdown
         </h2>

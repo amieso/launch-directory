@@ -2,6 +2,7 @@
 
 import { Video } from '@/types/video'
 import { getRelatedVideos } from '@/lib/get-related-videos'
+import { CompanyLink } from '@/components/ui/company-link'
 
 interface RelatedVideosProps {
   currentVideo: Video
@@ -38,7 +39,11 @@ export function RelatedVideos({ currentVideo, allVideos, onVideoSelect }: Relate
             <p className="text-xs md:text-sm text-white/80 truncate group-hover:text-white transition-colors">
               {video.title}
             </p>
-            <p className="text-[10px] md:text-xs text-white/50">{video.company}</p>
+            <CompanyLink
+              company={video.company}
+              onClick={(e) => e.stopPropagation()}
+              className="text-[10px] md:text-xs text-white/50 hover:text-white transition-colors"
+            />
           </button>
         ))}
       </div>

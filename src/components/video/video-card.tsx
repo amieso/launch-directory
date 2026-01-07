@@ -5,6 +5,7 @@ import Hls from 'hls.js'
 import { Video } from '@/types/video'
 import { formatDuration } from '@/lib/utils'
 import { SaveButton } from './save-button'
+import { CompanyLink } from '@/components/ui/company-link'
 
 function toProperCase(str: string): string {
   return str
@@ -106,7 +107,11 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
                 <span className="text-xs px-3 py-1 border border-white/40 rounded-full text-white">{toProperCase(video.style)}</span>
                 <span className="text-xs px-3 py-1 border border-white/40 rounded-full text-white">{toProperCase(video.productType)}</span>
               </div>
-              <span className="text-xs text-white/70 tracking-widest uppercase font-mono">{video.company}</span>
+              <CompanyLink
+                company={video.company}
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs text-white/70 tracking-widest uppercase font-mono hover:text-white transition-colors"
+              />
             </div>
           </div>
 
@@ -116,7 +121,11 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
       {/* Info below card */}
       <div className="flex items-center justify-between pt-[14px] pb-1.5">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xs text-muted shrink-0">{video.company}</span>
+          <CompanyLink
+            company={video.company}
+            onClick={(e) => e.stopPropagation()}
+            className="text-xs text-muted shrink-0 hover:text-foreground transition-colors"
+          />
           <span className="text-xs text-foreground truncate">{video.title}</span>
         </div>
         {isGhost ? (

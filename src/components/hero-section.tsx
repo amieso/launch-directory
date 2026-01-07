@@ -29,12 +29,12 @@ export function HeroSection() {
           >
             Join Lowkey
           </button>
-          <Link
-            href="/submit"
+          <a
+            href="mailto:submit@lowkey.so"
             className="inline-flex items-center justify-center px-4 py-[6px] text-sm text-muted border-2 border-surface rounded-full transition-colors hover:text-foreground/60 hover:border-foreground/60"
           >
             Submit Video
-          </Link>
+          </a>
         </div>
       </div>
     </section>

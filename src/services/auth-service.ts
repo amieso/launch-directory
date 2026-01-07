@@ -7,6 +7,7 @@ export interface SignUpData {
   email: string
   password: string
   name?: string
+  avatarColor?: string
 }
 
 export interface SignInData {
@@ -27,13 +28,14 @@ class AuthService {
     return createClient()
   }
 
-  async signUp({ email, password, name }: SignUpData) {
+  async signUp({ email, password, name, avatarColor }: SignUpData) {
     const { data, error } = await this.getSupabase().auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: name,
+          avatar_color: avatarColor,
         },
       },
     })

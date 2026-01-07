@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Video, STYLE_LABELS, PRODUCT_TYPE_LABELS } from '@/types/video'
 import { formatDuration } from '@/lib/utils'
+import { CompanyLink } from '@/components/ui/company-link'
 
 interface InfoPaneProps {
   video: Video
@@ -16,7 +17,7 @@ export function InfoPane({ video }: InfoPaneProps) {
     <aside className="space-y-6">
       {/* Title and Company */}
       <div>
-        <h1 className="text-xl font-medium text-foreground">{video.company}</h1>
+        <CompanyLink company={video.company} className="text-xl font-medium text-foreground hover:text-white transition-colors" />
         <p className="mt-0.5 text-base text-muted">{video.title}</p>
       </div>
 

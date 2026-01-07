@@ -1,44 +1,40 @@
-import { notFound } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { notFound, useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Metadata } from 'next'
+import { Loader2 } from 'lucide-react'
+import { useAuth } from '@/contexts/auth-context'
 import { Header } from '@/components/layout/header'
 import { VideoPlayer } from '@/components/video/video-player'
 import { InfoPane } from '@/components/video/info-pane'
-import { getVideoBySlug, getAllVideos } from '@/lib/videos'
+import { getVideoBySlug } from '@/lib/videos'
 
-interface VideoPageProps {
-  params: Promise<{ slug: string }>
-}
-
-export async function generateStaticParams() {
-  const videos = getAllVideos()
-  return videos.map((video) => ({ slug: video.slug }))
-}
-
-export async function generateMetadata({ params }: VideoPageProps): Promise<Metadata> {
-  const { slug } = await params
+export default function VideoPage() {
+  const params = useParams()
+  const router = useRouter()
+  const { authState } = useAuth()
+  const slug = params.slug as string
   const video = getVideoBySlug(slug)
 
-  if (!video) {
-    return {
-      title: 'Video Not Found | Lowkey',
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (authState === 'unauthenticated') {
+      router.push('/')
     }
+  }, [authState, router])
+
+  if (authState === 'loading') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-muted" />
+      </div>
+    )
   }
 
-  return {
-    title: `${video.title} by ${video.company} | Lowkey`,
-    description: video.description,
-    openGraph: {
-      title: `${video.title} by ${video.company}`,
-      description: video.description,
-      images: [video.thumbnailUrl],
-    },
+  if (authState !== 'authenticated') {
+    return null
   }
-}
-
-export default async function VideoPage({ params }: VideoPageProps) {
-  const { slug } = await params
-  const video = getVideoBySlug(slug)
 
   if (!video) {
     notFound()

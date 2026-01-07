@@ -5,15 +5,17 @@ import { Video } from '@/types/video'
 import { VideoGrid } from './video-grid'
 import { ControlBar } from './control-bar'
 import { FilterSidebar } from './filter-sidebar'
+import { DirectoryCards } from '@/components/navigation/directory-cards'
 import { useGridSize } from '@/hooks/use-grid-size'
 import { useAuth } from '@/contexts/auth-context'
+import { useFilter } from '@/contexts/filter-context'
 
 interface VideoSectionProps {
   videos: Video[]
 }
 
 export function VideoSection({ videos }: VideoSectionProps) {
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const { isFilterOpen, setIsFilterOpen } = useFilter()
   const [searchQuery, setSearchQuery] = useState('')
   const { authState } = useAuth()
   const isLoggedIn = authState !== 'unauthenticated'
@@ -37,12 +39,14 @@ export function VideoSection({ videos }: VideoSectionProps) {
   })
 
   return (
-    <div className="px-4 md:px-6 mt-6 md:mt-8">
-      {/* Control Bar Row - only shown for logged in users */}
+    <div className="px-4 md:px-6 mt-8 md:mt-10">
+      {/* Directory Cards + Control Bar Row - only shown for logged in users */}
       {isLoggedIn && (
-        <div className="py-2 mb-6">
-          <Suspense fallback={<div className="h-6" />}>
-            <ControlBar
+        <>
+          <DirectoryCards />
+          <div className="py-2 mb-6">
+            <Suspense fallback={<div className="h-6" />}>
+              <ControlBar
               onGridIncrease={increase}
               onGridDecrease={decrease}
               canGridIncrease={canIncrease}
@@ -53,7 +57,8 @@ export function VideoSection({ videos }: VideoSectionProps) {
               onSearchChange={setSearchQuery}
             />
           </Suspense>
-        </div>
+          </div>
+        </>
       )}
 
       {/* Content Area with Sidebar + Grid */}

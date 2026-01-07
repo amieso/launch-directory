@@ -3,17 +3,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { GridSizeControls } from './grid-size-controls'
-import { ProductType, PRODUCT_TYPE_LABELS } from '@/types/video'
+import { Industry, INDUSTRY_LABELS } from '@/types/video'
 import { cn } from '@/lib/utils'
 
-const PRODUCT_TABS: { label: string; value: ProductType | null }[] = [
+const INDUSTRY_TABS: { label: string; value: Industry | null }[] = [
   { label: 'All', value: null },
-  { label: 'SaaS', value: 'saas' },
-  { label: 'Mobile', value: 'mobile' },
+  { label: 'AI/ML', value: 'ai-ml' },
+  { label: 'Productivity', value: 'productivity' },
+  { label: 'Dev Tools', value: 'developer-tools' },
+  { label: 'Design', value: 'design' },
+  { label: 'Social', value: 'social' },
   { label: 'Fintech', value: 'fintech' },
-  { label: 'E-commerce', value: 'ecommerce' },
-  { label: 'Dev Tools', value: 'dev-tools' },
-  { label: 'AI', value: 'ai' },
+  { label: 'Hardware', value: 'hardware' },
+  { label: 'Enterprise', value: 'enterprise' },
 ]
 
 interface ControlBarProps {
@@ -44,19 +46,26 @@ export function ControlBar({
   const searchInputRef = useRef<HTMLInputElement>(null)
   const searchContainerRef = useRef<HTMLDivElement>(null)
 
-  const hasActiveFilter = searchParams.get('style') !== null
-  const urlProductType = searchParams.get('productType') as ProductType | null
+  const companyParam = searchParams.get('company')
+  const companyCount = companyParam ? companyParam.split(',').filter(Boolean).length : 0
+  const activeFilterCount = [
+    searchParams.get('style'),
+    searchParams.get('purpose'),
+    searchParams.get('stage'),
+    searchParams.get('duration'),
+  ].filter(Boolean).length + companyCount
+  const urlIndustry = searchParams.get('industry') as Industry | null
 
   // Local state for instant UI feedback
-  const [localProductType, setLocalProductType] = useState<ProductType | null>(urlProductType)
+  const [localIndustry, setLocalIndustry] = useState<Industry | null>(urlIndustry)
 
   // Sync local state when URL changes (e.g., browser back/forward)
   useEffect(() => {
-    setLocalProductType(urlProductType)
-  }, [urlProductType])
+    setLocalIndustry(urlIndustry)
+  }, [urlIndustry])
 
   // Use local state for UI, URL state for data
-  const currentProductType = localProductType
+  const currentIndustry = localIndustry
 
   // Focus input when search expands
   useEffect(() => {
@@ -72,12 +81,12 @@ export function ControlBar({
     }
   }, [searchQuery])
 
-  const getTabHref = (productType: ProductType | null) => {
+  const getTabHref = (industry: Industry | null) => {
     const params = new URLSearchParams(searchParams.toString())
-    if (productType) {
-      params.set('productType', productType)
+    if (industry) {
+      params.set('industry', industry)
     } else {
-      params.delete('productType')
+      params.delete('industry')
     }
     const queryString = params.toString()
     return queryString ? `${pathname}?${queryString}` : pathname
@@ -92,14 +101,14 @@ export function ControlBar({
           onClick={onFilterToggle}
           className={cn(
             'flex items-center gap-1.5 h-9 px-4 text-sm transition-colors rounded-full border shrink-0',
-            isFilterOpen || hasActiveFilter
+            isFilterOpen || activeFilterCount > 0
               ? 'text-foreground border-foreground/60'
               : 'text-muted border-border hover:text-foreground hover:border-foreground/40'
           )}
         >
           <span>Filters</span>
-          {hasActiveFilter && !isFilterOpen && (
-            <span className="text-xs text-muted">(1)</span>
+          {activeFilterCount > 0 && !isFilterOpen && (
+            <span className="text-xs text-muted font-mono">{activeFilterCount}</span>
           )}
         </button>
 
@@ -107,10 +116,10 @@ export function ControlBar({
         <div
           ref={searchContainerRef}
           className={cn(
-            'relative shrink-0 h-9 rounded-full border border-border transition-all duration-200 ease-out',
+            'relative shrink-0 h-9 rounded-full border transition-all duration-200 ease-out',
             isSearchExpanded
-              ? 'w-48 sm:w-64 bg-surface'
-              : 'w-9 hover:border-foreground/40'
+              ? 'w-48 sm:w-64 bg-surface border-transparent'
+              : 'w-9 border-border hover:border-foreground/40'
           )}
         >
           {/* Search icon - always visible */}
@@ -162,21 +171,21 @@ export function ControlBar({
         {/* Divider */}
         <div className="h-6 w-px bg-border shrink-0 mx-[10px]" />
 
-        {/* Product Type Tabs */}
+        {/* Industry Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-          {PRODUCT_TABS.map((tab) => {
-            const isActive = currentProductType === tab.value
+          {INDUSTRY_TABS.map((tab) => {
+            const isActive = currentIndustry === tab.value
             return (
               <button
                 key={tab.label}
                 onClick={() => {
-                  setLocalProductType(tab.value) // Instant UI update
+                  setLocalIndustry(tab.value) // Instant UI update
                   router.push(getTabHref(tab.value), { scroll: false })
                 }}
                 className={cn(
-                  'shrink-0 h-9 px-4 inline-flex items-center rounded-full text-sm font-medium border cursor-pointer',
+                  'shrink-0 h-9 px-4 inline-flex items-center rounded-full text-sm font-medium border cursor-pointer transition-colors',
                   isActive
-                    ? 'bg-foreground text-background border-foreground'
+                    ? 'bg-surface text-foreground border-transparent'
                     : 'bg-transparent text-muted border-border hover:text-foreground hover:border-foreground/40'
                 )}
               >

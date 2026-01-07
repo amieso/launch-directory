@@ -16,6 +16,7 @@ export type Database = {
           name: string | null
           username: string | null
           avatar_url: string | null
+          avatar_color: string | null
           bio: string | null
           website_url: string | null
           twitter_handle: string | null
@@ -29,6 +30,7 @@ export type Database = {
           name?: string | null
           username?: string | null
           avatar_url?: string | null
+          avatar_color?: string | null
           bio?: string | null
           website_url?: string | null
           twitter_handle?: string | null
@@ -42,6 +44,7 @@ export type Database = {
           name?: string | null
           username?: string | null
           avatar_url?: string | null
+          avatar_color?: string | null
           bio?: string | null
           website_url?: string | null
           twitter_handle?: string | null

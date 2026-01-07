@@ -2,6 +2,7 @@
 
 import { Video } from '@/types/video'
 import { Play, Volume2, VolumeX, ExternalLink } from 'lucide-react'
+import { CompanyLink } from '@/components/ui/company-link'
 
 interface HeroOverlayProps {
   video: Video
@@ -19,9 +20,10 @@ export function HeroOverlay({ video, isMuted, onMuteToggle, onPlayWithSound }: H
       {/* Content positioned at bottom */}
       <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 md:right-10 pointer-events-auto">
         {/* Company name */}
-        <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-[0.2em] font-mono mb-1">
-          {video.company}
-        </p>
+        <CompanyLink
+          company={video.company}
+          className="text-[10px] md:text-xs text-white/60 uppercase tracking-[0.2em] font-mono mb-1 hover:text-white transition-colors inline-block"
+        />
 
         {/* Title */}
         <h1 className="text-2xl md:text-4xl font-medium text-white mb-4 md:mb-6 tracking-tight">

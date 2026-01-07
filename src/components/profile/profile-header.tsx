@@ -29,8 +29,11 @@ export function ProfileHeader({ profile, user }: ProfileHeaderProps) {
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-24 h-24 rounded-full bg-surface border-2 border-border flex items-center justify-center">
-            <span className="text-2xl font-medium text-muted">{initials}</span>
+          <div
+            className="w-24 h-24 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: profile?.avatar_color || '#A78BFA' }}
+          >
+            <span className="text-2xl font-medium text-white">{initials}</span>
           </div>
         )}
       </div>

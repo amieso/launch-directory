@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ArrowUpRight, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { Video, STYLE_LABELS, PRODUCT_TYPE_LABELS } from '@/types/video'
+import { companySlug } from '@/lib/utils'
 
 interface InfoModeProps {
   video: Video
@@ -43,9 +44,12 @@ export function InfoMode({ video }: InfoModeProps) {
     <div className="flex flex-col">
       {/* Header */}
       <div className="mb-6">
-        <p className="text-xs text-muted font-mono uppercase tracking-widest mb-2.5">
+        <Link
+          href={`/company/${companySlug(video.company)}`}
+          className="text-xs text-muted font-mono uppercase tracking-widest mb-2.5 hover:text-foreground transition-colors inline-block"
+        >
           {video.company}
-        </p>
+        </Link>
         <h2 className="text-xl font-medium text-foreground leading-tight tracking-tight">
           {video.title}
         </h2>

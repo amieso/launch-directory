@@ -19,8 +19,16 @@ export default function CollectionDetailPage() {
 
   const collectionId = params.id as string
 
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (authState === 'unauthenticated') {
+      router.push('/')
+    }
+  }, [authState, router])
+
   useEffect(() => {
     async function fetchCollection() {
+      if (authState !== 'authenticated') return
       setIsLoading(true)
       try {
         const data = await collectionService.getCollection(collectionId)
@@ -33,7 +41,7 @@ export default function CollectionDetailPage() {
     }
 
     fetchCollection()
-  }, [collectionId])
+  }, [collectionId, authState])
 
   const handleDelete = async () => {
     if (!collection || collection.is_default) return

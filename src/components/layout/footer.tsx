@@ -12,12 +12,6 @@ export function Footer() {
 
           <div className="flex flex-wrap justify-center items-center gap-4 md:gap-5 order-1 md:order-2">
             <Link
-              href="/library"
-              className="text-xs text-muted hover:text-foreground transition-colors"
-            >
-              Library
-            </Link>
-            <Link
               href="/terms"
               className="text-xs text-muted hover:text-foreground transition-colors"
             >
@@ -30,7 +24,7 @@ export function Footer() {
               Privacy & Cookies
             </Link>
             <Link
-              href="https://twitter.com/lowkeyso"
+              href="https://twitter.com/tryamie"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-muted hover:text-foreground transition-colors"

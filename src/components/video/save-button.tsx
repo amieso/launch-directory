@@ -12,19 +12,19 @@ interface SaveButtonProps {
 }
 
 export function SaveButton({ videoSlug, className = '', size = 'md' }: SaveButtonProps) {
-  const { user, authState, openAuthModal, savedVideoSlugs, addSavedVideo, removeSavedVideo } = useAuth()
+  const { user, authState, savedVideoSlugs, addSavedVideo, removeSavedVideo } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+
+  // Hide button for logged-out users
+  if (authState !== 'authenticated') {
+    return null
+  }
 
   const isSaved = savedVideoSlugs.includes(videoSlug)
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-
-    if (authState !== 'authenticated') {
-      openAuthModal('signup')
-      return
-    }
 
     if (!user?.id) return
 

@@ -1,14 +1,36 @@
-import { Metadata } from 'next'
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Loader2 } from 'lucide-react'
+import { useAuth } from '@/contexts/auth-context'
 import { Header } from '@/components/layout/header'
 import { SubmissionForm } from '@/components/forms/submission-form'
 
-export const metadata: Metadata = {
-  title: 'Submit a Video | Lowkey',
-  description: 'Submit your product launch video to be featured on Lowkey',
-}
-
 export default function SubmitPage() {
+  const router = useRouter()
+  const { authState } = useAuth()
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (authState === 'unauthenticated') {
+      router.push('/')
+    }
+  }, [authState, router])
+
+  if (authState === 'loading') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-muted" />
+      </div>
+    )
+  }
+
+  if (authState !== 'authenticated') {
+    return null
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
