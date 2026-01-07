@@ -92,10 +92,10 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
           {/* Dark overlay with info on hover */}
           <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-5 pointer-events-none">
             {/* Title and save button at top */}
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-light text-white tracking-tight">{video.title}</h3>
+            <div className="flex items-start justify-between gap-12">
+              <h3 className="text-2xl font-light text-white tracking-tight line-clamp-2">{video.title}</h3>
               {!isGhost && (
-                <div className="pointer-events-auto">
+                <div className="pointer-events-auto shrink-0">
                   <SaveButton videoSlug={video.slug} size="sm" />
                 </div>
               )}

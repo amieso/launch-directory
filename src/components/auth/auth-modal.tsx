@@ -36,7 +36,7 @@ function getFriendlyError(error: string): string {
 
 export function AuthModal() {
   const { isAuthModalOpen, authModalMode, closeAuthModal, signInWithGoogle, signInWithMagicLink } = useAuth()
-  const [contentRef, bounds] = useMeasure()
+  const [contentRef, bounds] = useMeasure({ offsetSize: true })
   const [step, setStep] = useState<AuthStep>('initial')
   const [email, setEmail] = useState('')
   const [mode, setMode] = useState<'login' | 'signup'>(authModalMode)
@@ -185,8 +185,8 @@ export function AuthModal() {
             <motion.div
               animate={{ height: bounds.height > 0 ? bounds.height : 'auto' }}
               transition={shouldAnimate ? { type: 'spring', bounce: 0, duration: 0.4 } : { duration: 0 }}
-              style={!shouldAnimate ? { height: 'auto' } : undefined}
-              className="overflow-hidden rounded-[32px]"
+              style={{ height: !shouldAnimate ? 'auto' : undefined }}
+              className="overflow-hidden"
             >
               <div ref={contentRef}>
                 {/* Header */}
