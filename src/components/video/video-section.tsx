@@ -18,7 +18,9 @@ export function VideoSection({ videos }: VideoSectionProps) {
   const { isFilterOpen, setIsFilterOpen } = useFilter()
   const [searchQuery, setSearchQuery] = useState('')
   const { authState } = useAuth()
-  const isLoggedIn = authState !== 'unauthenticated'
+  // Only treat as logged in when we KNOW they're authenticated
+  // During loading, treat as logged out to prevent UI flash
+  const isLoggedIn = authState === 'authenticated'
   const {
     columns,
     increase,

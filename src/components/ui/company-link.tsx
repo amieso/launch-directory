@@ -13,7 +13,8 @@ interface CompanyLinkProps {
 
 export function CompanyLink({ company, className, onClick, children }: CompanyLinkProps) {
   const { authState } = useAuth()
-  const isLoggedIn = authState !== 'unauthenticated'
+  // Only treat as logged in when we KNOW they're authenticated
+  const isLoggedIn = authState === 'authenticated'
 
   if (isLoggedIn) {
     return (

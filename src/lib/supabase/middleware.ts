@@ -30,5 +30,9 @@ export async function updateSession(request: NextRequest) {
   // Refresh session if expired
   await supabase.auth.getUser()
 
+  // Prevent browser from caching pages with auth state (prevents bfcache flash)
+  supabaseResponse.headers.set('Cache-Control', 'no-store, must-revalidate')
+  supabaseResponse.headers.set('Pragma', 'no-cache')
+
   return supabaseResponse
 }

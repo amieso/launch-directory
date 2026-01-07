@@ -136,9 +136,9 @@ class AuthService {
     return session
   }
 
-  onAuthStateChange(callback: (user: AuthUser | null) => void) {
+  onAuthStateChange(callback: (user: AuthUser | null, event: string) => void) {
     const supabase = this.getSupabase()
-    return supabase.auth.onAuthStateChange(async (_event, session) => {
+    return supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -150,9 +150,9 @@ class AuthService {
           id: session.user.id,
           email: session.user.email!,
           profile,
-        })
+        }, event)
       } else {
-        callback(null)
+        callback(null, event)
       }
     })
   }

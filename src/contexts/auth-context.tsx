@@ -81,7 +81,6 @@ function AuthCallbackHandler() {
 function AuthProviderInner({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   // CRITICAL: Start as 'loading' always - this prevents any flash
-  // Components treat 'loading' same as 'authenticated' to prevent logged-out flash
   const [authState, setAuthState] = useState<AuthState>('loading')
   const isInitializedRef = useRef(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -147,9 +146,43 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    // Listen for auth changes - this is the primary source of truth
-    const { data: { subscription } } = authService.onAuthStateChange((authUser) => {
-      console.log('[AuthContext] onAuthStateChange:', authUser?.email ?? 'null')
+    // Do explicit auth check on mount - don't rely on onAuthStateChange for initial state
+    // This prevents flash from stale cached sessions
+    const initAuth = async () => {
+      try {
+        const currentUser = await authService.getUser()
+        if (currentUser) {
+          setUser(currentUser)
+          setAuthState('authenticated')
+          // Fetch saved videos
+          const collections = await collectionService.getCollections(currentUser.id)
+          const defaultCollection = collections.find(c => c.is_default)
+          if (defaultCollection) {
+            const fullCollection = await collectionService.getCollection(defaultCollection.id)
+            if (fullCollection) {
+              setSavedVideoSlugs(fullCollection.items.map(item => item.video_slug))
+            }
+          }
+        } else {
+          setAuthState('unauthenticated')
+        }
+      } catch {
+        setAuthState('unauthenticated')
+      }
+      isInitializedRef.current = true
+    }
+
+    initAuth()
+
+    // Listen for subsequent auth changes (sign in, sign out, token refresh)
+    const { data: { subscription } } = authService.onAuthStateChange((authUser: AuthUser | null, event: string) => {
+      console.log('[AuthContext] onAuthStateChange:', event, authUser?.email ?? 'null')
+
+      // Skip INITIAL_SESSION - we handle that with initAuth above
+      if (event === 'INITIAL_SESSION') {
+        return
+      }
+
       setUser(authUser)
       if (authUser) {
         setAuthState('authenticated')
@@ -169,7 +202,6 @@ function AuthProviderInner({ children }: { children: ReactNode }) {
         setAuthState('unauthenticated')
         setSavedVideoSlugs([])
       }
-      isInitializedRef.current = true
     })
 
     return () => {

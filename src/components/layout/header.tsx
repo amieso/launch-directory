@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { LogOut } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
@@ -8,13 +8,24 @@ import { useAuth } from '@/contexts/auth-context'
 export function Header() {
   const { authState, user, profile, openAuthModal, signOut } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  // Prevent hydration mismatch - only render auth UI after client mount
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const displayName = profile?.name || user?.email?.split('@')[0] || 'User'
   const initials = displayName.slice(0, 2).toUpperCase()
 
-  // During loading, show authenticated UI to prevent flash for logged-in users
+  // During loading or before mount, show skeleton to prevent flash
   const renderAuthSection = () => {
-    if (authState === 'loading' || authState === 'authenticated') {
+    if (!mounted || authState === 'loading') {
+      // Render a neutral skeleton placeholder during auth check
+      return <div className="w-7 h-7 rounded-full bg-white/10 animate-pulse" />
+    }
+
+    if (authState === 'authenticated') {
       return (
         <>
           <Link
