@@ -186,7 +186,7 @@ export function AuthModal() {
               animate={{ height: bounds.height > 0 ? bounds.height : 'auto' }}
               transition={shouldAnimate ? { type: 'spring', bounce: 0, duration: 0.4 } : { duration: 0 }}
               style={!shouldAnimate ? { height: 'auto' } : undefined}
-              className="overflow-hidden"
+              className="overflow-hidden rounded-[32px]"
             >
               <div ref={contentRef}>
                 {/* Header */}
@@ -253,7 +253,7 @@ export function AuthModal() {
                   </AnimatePresence>
                 </div>
 
-                <div className="flex flex-col gap-2 px-4 pt-12 pb-4">
+                <div className="flex flex-col gap-2 px-4 pt-12 pb-6">
                   <AnimatePresence mode="popLayout" initial={false}>
                     {step === 'initial' && (
                       <motion.div

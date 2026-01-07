@@ -74,6 +74,7 @@ export function VideoSection({ videos }: VideoSectionProps) {
           <VideoGrid
             videos={filteredVideos}
             columns={isHydrated ? columns : 4}
+            isLoading={authState === 'loading'}
           />
         </div>
       </div>
