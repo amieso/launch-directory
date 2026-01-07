@@ -253,7 +253,7 @@ export function AuthModal() {
                   </AnimatePresence>
                 </div>
 
-                <div className="flex flex-col gap-2 px-4 pt-12 pb-6">
+                <div className="flex flex-col gap-2 px-4 pt-12 pb-4">
                   <AnimatePresence mode="popLayout" initial={false}>
                     {step === 'initial' && (
                       <motion.div
