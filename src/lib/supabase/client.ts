@@ -14,3 +14,8 @@ export function createClient() {
   }
   return client
 }
+
+// Reset the singleton - used during sign out to ensure fresh state
+export function resetClient() {
+  client = null
+}

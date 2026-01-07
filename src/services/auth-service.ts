@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client'
+import { createClient, resetClient } from '@/lib/supabase/client'
 import type { Profile } from '@/types/database'
 
 export type AuthProvider = 'google' | 'github'
@@ -19,6 +19,14 @@ export interface AuthUser {
   id: string
   email: string
   profile: Profile | null
+}
+
+// Timeout wrapper for async operations
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>(resolve => setTimeout(() => resolve(fallback), ms))
+  ])
 }
 
 class AuthService {
@@ -82,6 +90,8 @@ class AuthService {
   async signOut() {
     // Use 'global' scope to invalidate all sessions on server, not just local
     const { error } = await this.getSupabase().auth.signOut({ scope: 'global' })
+    // Reset the singleton client to ensure fresh state on next auth
+    resetClient()
     if (error) throw error
   }
 
@@ -102,22 +112,31 @@ class AuthService {
   private async _getUser(): Promise<AuthUser | null> {
     try {
       const supabase = this.getSupabase()
-      // Use getSession() for initial check - faster and works offline
-      // getUser() validates with server but can hang if network issues
-      const { data: { session } } = await supabase.auth.getSession()
+      // Use getUser() to validate session with server - prevents stale localStorage data
+      // This ensures we always have fresh auth state on page refresh
+      // Add 5s timeout to prevent hanging on slow networks
+      const userResult = await withTimeout(
+        supabase.auth.getUser(),
+        5000,
+        null
+      )
 
-      if (!session?.user) {
+      if (!userResult?.data?.user) {
         return null
       }
 
-      const user = session.user
+      const user = userResult.data.user
 
-      // Fetch profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+      // Fetch profile with 3s timeout
+      const profilePromise = new Promise<Profile | null>(async (resolve) => {
+        try {
+          const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+          resolve(data)
+        } catch {
+          resolve(null)
+        }
+      })
+      const profile = await withTimeout(profilePromise, 3000, null)
 
       return {
         id: user.id,

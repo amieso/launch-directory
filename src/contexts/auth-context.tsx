@@ -9,9 +9,16 @@ import type { Profile } from '@/types/database'
 // Auth states: 'loading' | 'authenticated' | 'unauthenticated'
 type AuthState = 'loading' | 'authenticated' | 'unauthenticated'
 
+interface InitialUserData {
+  id: string
+  email: string
+  profile: Profile | null
+}
+
 interface AuthProviderProps {
   children: ReactNode
   initialAuthState?: AuthState
+  initialUser?: InitialUserData | null
 }
 
 interface AuthContextType {
@@ -76,13 +83,16 @@ function AuthCallbackHandler() {
   return null
 }
 
-function AuthProviderInner({ children, initialAuthState = 'loading' }: AuthProviderProps) {
-  const [user, setUser] = useState<AuthUser | null>(null)
-  // Start as loading until we have user data, even if server says authenticated
-  // This prevents flash of "User" with default avatar before profile loads
-  const [authState, setAuthState] = useState<AuthState>(
-    initialAuthState === 'unauthenticated' ? 'unauthenticated' : 'loading'
-  )
+function AuthProviderInner({ children, initialAuthState = 'loading', initialUser = null }: AuthProviderProps) {
+  // If server provides user data, use it immediately - no loading state needed
+  const [user, setUser] = useState<AuthUser | null>(initialUser)
+  // If we have initialUser, we can show authenticated immediately (no flash)
+  // Only show loading if server says authenticated but didn't provide user data
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    if (initialUser) return 'authenticated'
+    if (initialAuthState === 'unauthenticated') return 'unauthenticated'
+    return 'loading'
+  })
   const isInitializedRef = useRef(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
@@ -147,22 +157,38 @@ function AuthProviderInner({ children, initialAuthState = 'loading' }: AuthProvi
   }, [])
 
   useEffect(() => {
-    // Server already determined auth state via getUser() which validates with Supabase server
-    // Only fetch user data if server says we're authenticated - don't override server's determination
-    // This prevents flash from stale localStorage sessions that server already rejected
+    // Server provides initialUser with profile data - no need to re-fetch
+    // Only fetch collections (saved videos) on client since that's user-specific state
     const initAuth = async () => {
       try {
-        // If server says unauthenticated, trust it - don't let stale client session override
+        // If server says unauthenticated, trust it
         if (initialAuthState === 'unauthenticated') {
           isInitializedRef.current = true
           return
         }
 
-        // Server says authenticated - fetch user data for the UI
+        // If we have initialUser from server, just fetch collections
+        if (initialUser) {
+          // Fetch saved videos in background - don't block UI
+          collectionService.getCollections(initialUser.id).then(async collections => {
+            const defaultCollection = collections.find(c => c.is_default)
+            if (defaultCollection) {
+              const fullCollection = await collectionService.getCollection(defaultCollection.id)
+              if (fullCollection) {
+                setSavedVideoSlugs(fullCollection.items.map(item => item.video_slug))
+              }
+            }
+          }).catch(err => console.error('Error fetching collections:', err))
+          isInitializedRef.current = true
+          return
+        }
+
+        // Fallback: Server said authenticated but didn't provide user data
+        // This shouldn't happen normally, but handle it gracefully
         const currentUser = await authService.getUser()
         if (currentUser) {
           setUser(currentUser)
-          setAuthState('authenticated') // Only show as authenticated after user data is loaded
+          setAuthState('authenticated')
           // Fetch saved videos
           const collections = await collectionService.getCollections(currentUser.id)
           const defaultCollection = collections.find(c => c.is_default)
@@ -173,7 +199,7 @@ function AuthProviderInner({ children, initialAuthState = 'loading' }: AuthProvi
             }
           }
         } else {
-          // Session expired between SSR and client hydration - update state
+          // Session expired between SSR and client hydration
           setAuthState('unauthenticated')
         }
       } catch {
@@ -249,11 +275,21 @@ function AuthProviderInner({ children, initialAuthState = 'loading' }: AuthProvi
   }
 
   const signOut = async () => {
-    await authService.signOut()
+    // Clear local state first to prevent UI flash
     setUser(null)
     setSavedVideoSlugs([])
     setAuthState('unauthenticated')
-    // Force full page reload to clear server cache and get fresh auth state
+
+    try {
+      // Call server-side logout to properly clear cookies
+      await fetch('/auth/logout', { method: 'POST' })
+      // Also clear client-side session
+      await authService.signOut()
+    } catch (error) {
+      console.error('[AuthContext] signOut error:', error)
+    }
+
+    // Force full page reload to get fresh server state
     window.location.href = '/'
   }
 
@@ -292,8 +328,8 @@ function AuthProviderInner({ children, initialAuthState = 'loading' }: AuthProvi
   )
 }
 
-export function AuthProvider({ children, initialAuthState }: AuthProviderProps) {
-  return <AuthProviderInner initialAuthState={initialAuthState}>{children}</AuthProviderInner>
+export function AuthProvider({ children, initialAuthState, initialUser }: AuthProviderProps) {
+  return <AuthProviderInner initialAuthState={initialAuthState} initialUser={initialUser}>{children}</AuthProviderInner>
 }
 
 export function useAuth() {
