@@ -43,7 +43,7 @@ export function VideoMetadata({ video }: VideoMetadataProps) {
           </p>
         </div>
 
-        {/* Right: Credits + Tags */}
+        {/* Right: Credits */}
         <div className="space-y-3 text-sm">
           {/* Credits */}
           {video.credits.length > 0 && (

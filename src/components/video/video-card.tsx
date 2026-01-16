@@ -1,17 +1,11 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 import Hls from 'hls.js'
 import { Video } from '@/types/video'
 import { formatDuration } from '@/lib/utils'
 import { CompanyLink } from '@/components/ui/company-link'
-
-function toProperCase(str: string): string {
-  return str
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
 
 interface VideoCardProps {
   video: Video
@@ -66,7 +60,11 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
       className={`group ${isGhost ? '' : 'cursor-pointer'}`}
     >
       {/* Video container - always 16:9 */}
-      <div className="relative aspect-video w-full rounded-[6px] group-hover:ring-1 group-hover:ring-white/[0.08]">
+      <motion.div
+        layoutId={isGhost ? undefined : `video-${video.id}`}
+        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+        className="relative aspect-video w-full rounded-[6px] group-hover:ring-1 group-hover:ring-white/[0.08]"
+      >
         <div className="absolute inset-0 overflow-hidden rounded-[6px] bg-surface isolate">
           {isGhost ? (
             // Ghost card placeholder
@@ -88,29 +86,14 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
             />
           )}
 
-          {/* Dark overlay with info on hover */}
-          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-5 pointer-events-none">
-            {/* Title at top */}
-            <div className="flex items-start justify-between gap-12">
-              <h3 className="text-2xl font-light text-white tracking-tight line-clamp-2">{video.title}</h3>
-            </div>
-
-            {/* Bottom row: tags left, company right */}
-            <div className="flex items-end justify-between">
-              <div className="flex gap-2">
-                <span className="text-xs px-3 py-1 border border-white/40 rounded-full text-white">{toProperCase(video.style)}</span>
-                <span className="text-xs px-3 py-1 border border-white/40 rounded-full text-white">{toProperCase(video.productType)}</span>
-              </div>
-              <CompanyLink
-                company={video.company}
-                onClick={(e) => e.stopPropagation()}
-                className="text-xs text-white/70 tracking-widest uppercase font-mono hover:text-white transition-colors"
-              />
-            </div>
+          {/* Dark overlay with company + title on hover */}
+          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-start p-5 pointer-events-none">
+            <span className="text-xs text-white/70 tracking-widest uppercase font-mono">{video.company}</span>
+            <h3 className="text-2xl font-light text-white tracking-tight line-clamp-2 mt-2">{video.title}</h3>
           </div>
 
         </div>
-      </div>
+      </motion.div>
 
       {/* Info below card */}
       <div className="flex items-center justify-between pt-[14px] pb-1.5">

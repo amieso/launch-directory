@@ -41,7 +41,7 @@ export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
         ))}
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {selectedVideo && (
           <VideoModal
             video={selectedVideo}

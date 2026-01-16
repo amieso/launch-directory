@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Play, Pause, X } from 'lucide-react'
+import { Play, Pause } from 'lucide-react'
 import { Video } from '@/types/video'
 import { VideoPlayer, VideoPlayerHandle, QualityLevel } from './modal/video-player'
 import { PlayerControls } from './modal/player-controls'
@@ -112,30 +112,70 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
       {/* Backdrop - click to close */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 transition-colors"
-        aria-label="Close modal"
-      >
-        <X className="w-5 h-5 text-white" />
-      </button>
-
       {/* Modal content */}
       <motion.div
-        initial={{ opacity: 0, y: 50, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 30 }}
-        transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-        className="relative z-10 w-full max-w-[1600px]"
+        className="relative z-10 w-full max-w-[1254px]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Title bar */}
+        <div className="flex justify-between items-center mb-6 px-1.5">
+          <div className="flex flex-col gap-2">
+            <motion.span
+              className="text-xs text-white/70 tracking-widest uppercase font-mono"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{
+                enter: { delay: 0.15, duration: 0.25, ease: [0.23, 1, 0.32, 1] },
+                exit: { duration: 0.1, ease: [0.4, 0, 1, 1] }
+              }}
+            >
+              {video.company}
+            </motion.span>
+            <motion.h2
+              id="modal-title"
+              className="text-2xl font-light text-white tracking-tight"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{
+                enter: { delay: 0.18, duration: 0.25, ease: [0.23, 1, 0.32, 1] },
+                exit: { duration: 0.1, ease: [0.4, 0, 1, 1] }
+              }}
+            >
+              {video.title}
+            </motion.h2>
+          </div>
+          {video.websiteUrl && (
+            <motion.a
+              href={video.websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-8 px-3.5 text-sm rounded-full bg-transparent text-foreground border border-border hover:bg-surface inline-flex items-center justify-center font-medium transition-all"
+              initial={{ opacity: 0, y: -2 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{
+                enter: { delay: 0.15, duration: 0.25, ease: [0.23, 1, 0.32, 1] },
+                exit: { duration: 0.1, ease: [0.4, 0, 1, 1] }
+              }}
+            >
+              Visit
+            </motion.a>
+          )}
+        </div>
+
         {/* Video section with player controls */}
         <div className="rounded-lg overflow-hidden">
-          <div ref={videoContainerRef} className="relative aspect-video bg-black rounded-lg overflow-hidden isolate">
+          <motion.div
+            ref={videoContainerRef}
+            layoutId={`video-${video.id}`}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            className="relative aspect-video bg-black rounded-lg overflow-hidden isolate"
+          >
             {/* Clickable overlay to toggle play/pause - excludes bottom controls area */}
             <button
               onClick={togglePlay}
@@ -179,7 +219,7 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
                 onQualityChange={handleQualityChange}
               />
             )}
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </motion.div>

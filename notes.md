@@ -46,3 +46,21 @@
 ## 2026-01-16 - Deployment
 - Deployed to: https://lowkxy.vercel.app
 - Changes included: Newsletter subscription with Resend (API route, welcome email template, logo hosted at /logo.png)
+
+## 2026-01-16 - Video Modal Title Bar
+- Added title bar above video player with company/title + Visit button
+- Staggered animations: company (delay 0.15), title (delay 0.18), button (delay 0.15)
+- Animation uses ease [0.23, 1, 0.32, 1] for smooth feel
+- Button uses subtle y: -2 movement, text uses y: -10
+- Modal max-width reduced from 1600px to 1254px
+
+## 2026-01-16 - Card→Modal Morph Animation
+- Uses Framer Motion shared layout animation via `layoutId`
+- Both VideoCard and VideoModal player containers share `layoutId={video-${video.id}}`
+- Transition: duration 0.25s, ease [0.4, 0, 0.2, 1]
+- AnimatePresence with mode="wait" wraps the modal in video-grid.tsx
+- Additional animations (not part of morph):
+  - Backdrop fades in (duration 0.2s)
+  - Title bar elements slide down with staggered delays (0.15s, 0.18s)
+  - Exit animations are fast (0.1s) with upward movement to avoid ghosting
+- No close button - dismiss via backdrop click or Escape key
