@@ -19,7 +19,7 @@ export function WelcomeEmail() {
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
-            <Img src={LOGO_URL} width="100" height="28" alt="lowkey" />
+            <Img src={LOGO_URL} width="120" height="60" alt="lowkey" />
           </Section>
 
           <Text style={heading}>you're in</Text>
