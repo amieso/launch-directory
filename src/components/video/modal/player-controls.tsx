@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Play, Pause } from 'lucide-react'
+import { PlayIcon, PauseIcon } from '@/components/ui/player-icons'
 import { formatDuration } from '@/lib/utils'
 import { Chapter } from '@/types/video'
 import { SegmentedSeekBar } from './segmented-seek-bar'
@@ -132,13 +132,13 @@ export function PlayerControls({
           {/* Play/Pause */}
           <button
             onClick={togglePlay}
-            className="p-1.5 flex items-center justify-center rounded hover:bg-white/10 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded hover:bg-white/10 transition-colors"
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
-              <Pause className="w-5 h-5 text-white fill-white" />
+              <PauseIcon className="w-5 h-5 text-white" />
             ) : (
-              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+              <PlayIcon className="w-5 h-5 text-white" />
             )}
           </button>
 

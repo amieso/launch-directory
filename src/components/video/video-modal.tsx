@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Play, Pause } from 'lucide-react'
+import { PlayIcon, PauseIcon } from '@/components/ui/player-icons'
 import { Video } from '@/types/video'
 import { VideoPlayer, VideoPlayerHandle, QualityLevel } from './modal/video-player'
 import { PlayerControls } from './modal/player-controls'
@@ -196,9 +196,9 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
               >
                 <div className="w-20 h-20 rounded-full bg-black/60 flex items-center justify-center">
                   {lastAction === 'play' ? (
-                    <Play className="w-10 h-10 text-white fill-white ml-1" />
+                    <PlayIcon className="w-10 h-10 text-white" />
                   ) : (
-                    <Pause className="w-10 h-10 text-white fill-white" />
+                    <PauseIcon className="w-10 h-10 text-white" />
                   )}
                 </div>
               </motion.div>

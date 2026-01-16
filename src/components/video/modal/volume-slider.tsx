@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Volume2, Volume1, VolumeX } from 'lucide-react'
+import { SoundFullIcon, SoundMidIcon, SoundOffIcon } from '@/components/ui/player-icons'
 
 interface VolumeSliderProps {
   videoRef: React.RefObject<HTMLVideoElement | null>
@@ -62,10 +62,10 @@ export function VolumeSlider({ videoRef }: VolumeSliderProps) {
   }
 
   const VolumeIcon = isMuted || volume === 0
-    ? VolumeX
+    ? SoundOffIcon
     : volume < 0.5
-      ? Volume1
-      : Volume2
+      ? SoundMidIcon
+      : SoundFullIcon
 
   const displayVolume = isMuted ? 0 : volume
 
@@ -78,7 +78,7 @@ export function VolumeSlider({ videoRef }: VolumeSliderProps) {
     >
       <button
         onClick={toggleMute}
-        className="p-1.5"
+        className="w-8 h-8 flex items-center justify-center"
         aria-label={isMuted ? 'Unmute' : 'Mute'}
       >
         <VolumeIcon className="w-5 h-5 text-white" />

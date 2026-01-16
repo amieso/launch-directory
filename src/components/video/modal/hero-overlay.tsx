@@ -1,7 +1,8 @@
 'use client'
 
 import { Video } from '@/types/video'
-import { Play, Volume2, VolumeX, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
+import { PlayIcon, SoundFullIcon, SoundOffIcon } from '@/components/ui/player-icons'
 import { CompanyLink } from '@/components/ui/company-link'
 
 interface HeroOverlayProps {
@@ -37,7 +38,7 @@ export function HeroOverlay({ video, isMuted, onMuteToggle, onPlayWithSound }: H
             onClick={onPlayWithSound}
             className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 bg-white text-black font-medium rounded text-sm md:text-base hover:bg-white/90 transition-colors"
           >
-            <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
+            <PlayIcon className="w-4 h-4 md:w-5 md:h-5" />
             Play
           </button>
 
@@ -63,9 +64,9 @@ export function HeroOverlay({ video, isMuted, onMuteToggle, onPlayWithSound }: H
         aria-label={isMuted ? 'Unmute' : 'Mute'}
       >
         {isMuted ? (
-          <VolumeX className="w-4 h-4 md:w-5 md:h-5 text-white" />
+          <SoundOffIcon className="w-4 h-4 md:w-5 md:h-5 text-white" />
         ) : (
-          <Volume2 className="w-4 h-4 md:w-5 md:h-5 text-white" />
+          <SoundFullIcon className="w-4 h-4 md:w-5 md:h-5 text-white" />
         )}
       </button>
     </div>
