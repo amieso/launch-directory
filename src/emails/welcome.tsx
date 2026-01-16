@@ -32,11 +32,14 @@ export function WelcomeEmail() {
             in the meantime, check out the latest launch videos from top companies.
           </Text>
 
-          <Text style={signature}>— the lowkey team</Text>
+          <Text style={signature}>⛱️ dennis</Text>
 
           <Section style={footer}>
             <Text style={footerText}>
-              you're receiving this because you signed up at lowkey.so
+              You are receiving this email because you opted-in to receive updates from Lowkey
+            </Text>
+            <Text style={footerText}>
+              Amie, Adalbertstr. 20, 10997, Berlin
             </Text>
           </Section>
         </Container>
