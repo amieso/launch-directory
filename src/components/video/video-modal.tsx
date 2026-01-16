@@ -204,6 +204,7 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
             <VideoPlayer
               ref={playerRef}
               src={video.videoUrl}
+              startMuted={false}
               onQualityLevelsChange={setQualityLevels}
             />
 

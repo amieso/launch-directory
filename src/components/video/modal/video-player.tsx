@@ -21,11 +21,12 @@ export interface VideoPlayerHandle {
 interface VideoPlayerProps {
   src: string
   className?: string
+  startMuted?: boolean
   onQualityLevelsChange?: (levels: QualityLevel[]) => void
 }
 
 export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
-  function VideoPlayer({ src, className = '', onQualityLevelsChange }, ref) {
+  function VideoPlayer({ src, className = '', startMuted = true, onQualityLevelsChange }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const hlsRef = useRef<Hls | null>(null)
     const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([])
@@ -99,7 +100,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
     return (
       <video
         ref={videoRef}
-        muted
+        muted={startMuted}
         loop
         playsInline
         preload="auto"
