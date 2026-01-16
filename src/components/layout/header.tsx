@@ -19,19 +19,13 @@ export function Header() {
           </Link>
 
           {/* Right side nav */}
-          <nav className="flex items-center gap-4 md:gap-6 [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
+          <nav className="flex items-center [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
             <a
-              href="mailto:submit@lowkey.so"
+              href="#subscribe"
               className="text-sm text-foreground hover:text-foreground/80 transition-colors"
             >
-              Submit
+              Subscribe
             </a>
-            <Link
-              href="/about"
-              className="text-sm text-foreground hover:text-foreground/80 transition-colors"
-            >
-              About
-            </Link>
           </nav>
         </div>
       </div>
