@@ -79,7 +79,7 @@ export function HeroSection() {
                   }
                 }}
                 disabled={status === 'success'}
-                className="w-full h-full px-4 bg-transparent rounded-full text-sm text-foreground placeholder:text-muted-dark/50 placeholder:text-center text-center focus:outline-none"
+                className="w-full h-full px-4 bg-transparent rounded-full text-base text-foreground placeholder:text-muted-dark/50 placeholder:text-center text-center focus:outline-none"
                 style={{
                   opacity: status === 'success' ? 0 : 1,
                   transition: 'opacity 150ms ease-out'
