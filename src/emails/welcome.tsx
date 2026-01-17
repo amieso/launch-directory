@@ -10,7 +10,7 @@ import {
   Text,
 } from '@react-email/components'
 
-const LOGO_URL = 'https://lowkxy.vercel.app/logo.png'
+const LOGO_URL = 'https://lowkxy.vercel.app/logo-black.png'
 
 interface WelcomeEmailProps {
   email: string
@@ -24,7 +24,7 @@ export function WelcomeEmail({ email }: WelcomeEmailProps) {
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
-            <Img src={LOGO_URL} width="120" height="60" alt="lowkey" />
+            <Img src={LOGO_URL} width="44" height="44" alt="lowkey" />
           </Section>
 
           <Text style={heading}>you're in</Text>
@@ -64,6 +64,6 @@ const paragraph = { fontSize: '15px', lineHeight: '1.6', color: '#525252', margi
 const signature = { fontSize: '15px', color: '#525252', margin: '32px 0 0 0' }
 const footer = { marginTop: '48px', paddingTop: '24px', borderTop: '1px solid #e5e5e5' }
 const footerText = { fontSize: '12px', color: '#a1a1a1', margin: '0' }
-const unsubscribeLink = { fontSize: '12px', color: '#a1a1a1', marginTop: '8px', display: 'block' }
+const unsubscribeLink = { fontSize: '12px', color: '#a1a1a1', marginTop: '0', display: 'block' }
 
 export default WelcomeEmail
