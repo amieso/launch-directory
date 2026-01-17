@@ -156,6 +156,40 @@ export default function ComponentsPage() {
           </div>
         </section>
 
+        {/* Fonts */}
+        <section className="border-t border-border">
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            <div className="px-8 md:px-16 lg:px-24 py-20 lg:py-32">
+              <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-8">Fonts</h2>
+              <p className="text-lg text-muted leading-relaxed max-w-md">
+                Three typefaces for distinct purposes. Inter for UI, Kanit for brand, JetBrains Mono for technical.
+              </p>
+            </div>
+
+            <div className="bg-surface/30 px-8 md:px-16 lg:px-24 py-20 lg:py-32">
+              <div className="space-y-16">
+                <div>
+                  <p className="text-xs font-mono text-muted uppercase tracking-widest mb-4">Inter</p>
+                  <p className="text-2xl font-sans">The quick brown fox jumps over the lazy dog</p>
+                  <p className="text-sm text-muted mt-2">Body text, headings, UI elements</p>
+                </div>
+
+                <div>
+                  <p className="text-xs font-mono text-muted uppercase tracking-widest mb-4">Kanit</p>
+                  <p className="text-2xl font-kanit font-bold">lowkey</p>
+                  <p className="text-sm text-muted mt-2">Wordmark only, 700 weight</p>
+                </div>
+
+                <div>
+                  <p className="text-xs font-mono text-muted uppercase tracking-widest mb-4">JetBrains Mono</p>
+                  <p className="text-lg font-mono">FEATURED · 1:32 · DEC 2024</p>
+                  <p className="text-sm text-muted mt-2">Captions, labels, technical text</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Typography */}
         <section className="border-t border-border">
           <div className="grid grid-cols-1 lg:grid-cols-2">
