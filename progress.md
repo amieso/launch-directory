@@ -50,5 +50,21 @@
 - [ ] Fix intro logo handoff animation (logo jumps during settling phase)
 - [ ] Investigate intro logo trace animation on mobile (user reports it's "messed up")
 
+## Recently Completed (Security Audit - Jan 2026)
+- [x] Fixed XSS vulnerability in company page (innerHTML → textContent)
+- [x] Restricted image domains in next.config.ts (was allowing **)
+- [x] Added security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy)
+- [x] Improved email validation with Zod (was just checking for @)
+- [x] Removed test email handler from production code
+- [x] Removed console.logs leaking email addresses in server logs
+
+## Recently Completed (Codebase Cleanup - Jan 2026)
+- [x] Deleted unused public assets (logo.svg, logo.png, logo-dark.svg, logomark.svg, logomark-dark.svg, favicon-black.png, favicon-white.png, og-image.svg, og-image.png)
+- [x] Deleted src/icons/ folder (source SVGs now in React components)
+- [x] Deleted unused UI components (input.tsx, modal.tsx)
+- [x] Removed unused npm dependencies (@supabase/ssr, @supabase/supabase-js, react-use-measure)
+- [x] Cleaned up dead code in video.ts (removed unused types, interfaces, constants)
+- [x] Removed unused props from VideoModal (allVideos, onVideoChange)
+
 ## Backlog
 (none)

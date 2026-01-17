@@ -58,7 +58,7 @@ export function HeroSection() {
           A curated collection of the best product launch videos. Subscribe to get the latest launches delivered to your inbox.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 md:mt-10 w-full md:w-auto flex justify-center">
+        <form onSubmit={handleSubmit} className="mt-10 md:mt-10 w-full md:w-auto flex justify-center">
           <div className="relative w-full md:w-auto">
             <div className="relative flex justify-center">
               <EmojiConfetti trigger={status === 'success'} />

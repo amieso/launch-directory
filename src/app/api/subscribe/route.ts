@@ -1,6 +1,9 @@
 import { Resend } from 'resend'
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { WelcomeEmail } from '@/emails/welcome'
+
+const emailSchema = z.string().email()
 
 export async function POST(request: Request) {
   const apiKey = process.env.RESEND_API_KEY
@@ -13,41 +16,32 @@ export async function POST(request: Request) {
 
   const { email } = await request.json()
 
-  if (!email || !email.includes('@')) {
+  const result = emailSchema.safeParse(email)
+  if (!result.success) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
-  }
-
-  // Test email for error state
-  if (email === 'test@gmail.com') {
-    return NextResponse.json({ error: 'Test error' }, { status: 500 })
   }
 
   const resend = new Resend(apiKey)
 
-  console.log('Creating contact for:', email)
-  const { data: contactData, error } = await resend.contacts.create({
+  const { error } = await resend.contacts.create({
     audienceId,
     email,
   })
-  console.log('Contact result:', { contactData, error })
 
   if (error) {
     if (error.message?.includes('already exists')) {
-      console.log('Contact already exists, returning success')
       return NextResponse.json({ success: true })
     }
     console.error('Resend error:', error)
     return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 })
   }
 
-  console.log('Sending welcome email to:', email)
-  const { data: emailData, error: emailError } = await resend.emails.send({
+  await resend.emails.send({
     from: 'lowkey <onboarding@resend.dev>',
     to: email,
     subject: 'welcome to lowkey',
     react: WelcomeEmail({ email }),
   })
-  console.log('Email result:', { emailData, emailError })
 
   return NextResponse.json({ success: true })
 }

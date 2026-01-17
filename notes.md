@@ -120,10 +120,8 @@ Added theme switching with dark as default and oatmeal light mode as option.
 - Twitter, Facebook, LinkedIn, iMessage do NOT animate GIFs in link previews (first frame only)
 
 **Logo files in /public:**
-- `logomark.svg` - White eye mark (for dark backgrounds)
-- `logomark-dark.svg` - Black eye mark (for light backgrounds)
-- `logo.svg` - "lowkey" wordmark
-- `favicon-white.png`, `favicon-black.png` - PNG versions
+- `animated-og.gif` - Animated eye logo for OG image
+- `logo-black.png` - Black logo used in welcome email
 
 **Header logo:** Icon + 8px gap + wordmark, uses `currentColor` to adapt to theme
 
@@ -175,7 +173,6 @@ Replaced Lucide icons with custom SVG icons for the video player controls.
 
 **Icons created:**
 - `src/components/ui/player-icons.tsx` - React components for all icons
-- `src/icons/` - Source SVG files (9 icons)
 
 **Icons included:**
 - PlayIcon, PauseIcon - playback controls
@@ -363,3 +360,54 @@ Improved error handling for newsletter subscription:
 ## 2026-01-17 - Tablet Grid Layout
 
 Changed video grid breakpoint from `md:` (768px) to `lg:` (1024px) so tablets/iPad mini show 2 large cards per row instead of jumping to 4 columns.
+
+## 2026-01-17 - Security Audit Fixes
+
+**What was fixed:**
+1. **XSS vulnerability** in company page - `innerHTML` → `textContent` for fallback logo initials
+2. **Image domains** - Restricted from `hostname: '**'` to specific allowed domains
+3. **Security headers** - Added X-Content-Type-Options, X-Frame-Options, Referrer-Policy
+4. **Email validation** - Now uses Zod schema instead of simple `includes('@')` check
+5. **Console.logs** - Removed from subscribe API (were leaking email addresses to server logs)
+6. **Test handler** - Removed hardcoded `test@gmail.com` error handler
+
+**What was intentionally NOT fixed (to preserve animations):**
+- HLS Safari cleanup (risk of video flicker)
+- React.memo on VideoCard (could affect Framer Motion layout animations)
+- Video grid stagger timing (intentional design)
+- VideoModal state batching (could break animation coordination)
+- SMIL animation cleanup in intro-logo (could break intro animation)
+
+**Allowed image domains:**
+- img.logo.dev
+- image.mux.com
+- stream.mux.com
+- unavatar.io
+- static.amo.co
+
+## 2026-01-17 - Codebase Cleanup
+
+Removed all unused files and dependencies after the auth/filter streamline.
+
+**Deleted from /public:**
+- Unused logo variants (logo.svg, logo.png, logo-dark.svg, logomark.svg, logomark-dark.svg)
+- Unused favicon files (favicon-black.png, favicon-white.png)
+- Unused OG images (og-image.svg, og-image.png)
+- Only kept: animated-og.gif (OG image), logo-black.png (welcome email)
+
+**Deleted from /src:**
+- `src/icons/` folder - Source SVGs converted to React components in player-icons.tsx
+- `src/components/ui/input.tsx` - Unused (custom inputs used)
+- `src/components/ui/modal.tsx` - Unused (VideoModal used)
+
+**Removed npm dependencies:**
+- `@supabase/ssr`, `@supabase/supabase-js` - Auth removed
+- `react-use-measure` - Never used
+
+**Cleaned up video.ts:**
+- Removed: DurationCategory, SegmentType, Segment, TranscriptEntry, Comment
+- Removed: STYLE_LABELS, PURPOSE_LABELS, DURATION_LABELS, getDurationCategory()
+- Kept: PRODUCT_TYPE_LABELS, INDUSTRY_LABELS (used in company page)
+
+**Removed unused VideoModal props:**
+- `allVideos` and `onVideoChange` - Leftover from old video navigation feature

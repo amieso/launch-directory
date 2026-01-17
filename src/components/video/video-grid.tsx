@@ -65,9 +65,7 @@ export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
         {selectedVideo && (
           <VideoModal
             video={selectedVideo}
-            allVideos={videos}
             onClose={() => setSelectedVideo(null)}
-            onVideoChange={setSelectedVideo}
           />
         )}
       </AnimatePresence>

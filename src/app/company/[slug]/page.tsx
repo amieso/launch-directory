@@ -45,7 +45,10 @@ export default function CompanyPage() {
                   target.style.display = 'none'
                   const fallback = document.createElement('div')
                   fallback.className = 'w-[72px] h-[72px] rounded-[16px] bg-surface border border-border flex items-center justify-center'
-                  fallback.innerHTML = `<span class="text-2xl font-bold text-muted">${companyName.slice(0, 2).toUpperCase()}</span>`
+                  const span = document.createElement('span')
+                  span.className = 'text-2xl font-bold text-muted'
+                  span.textContent = companyName.slice(0, 2).toUpperCase()
+                  fallback.appendChild(span)
                   target.parentElement!.appendChild(fallback)
                 }}
               />
@@ -107,9 +110,7 @@ export default function CompanyPage() {
       {selectedVideo && (
         <VideoModal
           video={selectedVideo}
-          allVideos={companyVideos}
           onClose={() => setSelectedVideo(null)}
-          onVideoChange={setSelectedVideo}
         />
       )}
     </div>

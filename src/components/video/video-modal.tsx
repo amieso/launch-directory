@@ -10,9 +10,7 @@ import { getChaptersForVideo } from '@/data/chapters'
 
 interface VideoModalProps {
   video: Video
-  allVideos: Video[]
   onClose: () => void
-  onVideoChange: (video: Video) => void
 }
 
 export function VideoModal({ video, onClose }: VideoModalProps) {

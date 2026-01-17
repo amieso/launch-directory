@@ -458,9 +458,7 @@ export default function ComponentsPage() {
         {selectedVideo && (
           <VideoModal
             video={selectedVideo}
-            allVideos={[sampleVideo]}
             onClose={handleModalClose}
-            onVideoChange={handleVideoSelect}
           />
         )}
       </div>
