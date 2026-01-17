@@ -10,7 +10,8 @@ import {
   Text,
 } from '@react-email/components'
 
-const LOGO_URL = 'https://lowkxy.vercel.app/logo-black.png'
+// Logo is embedded via CID attachment in the API route
+const LOGO_CID = 'cid:logo'
 
 interface WelcomeEmailProps {
   email: string
@@ -24,7 +25,13 @@ export function WelcomeEmail({ email }: WelcomeEmailProps) {
       <Body style={main}>
         <Container style={container}>
           <Section style={logoSection}>
-            <Img src={LOGO_URL} width="44" height="44" alt="lowkey" />
+            <Img
+              src={LOGO_CID}
+              width="44"
+              height="44"
+              alt="lowkey"
+              style={{ display: 'block', outline: 'none', border: 'none', textDecoration: 'none' }}
+            />
           </Section>
 
           <Text style={heading}>you're in</Text>

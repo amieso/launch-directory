@@ -36,12 +36,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 })
   }
 
-  await resend.emails.send({
+  const { error: sendError } = await resend.emails.send({
     from: 'lowkey <onboarding@resend.dev>',
     to: email,
     subject: 'welcome to lowkey',
     react: WelcomeEmail({ email }),
+    attachments: [
+      {
+        filename: 'logo.png',
+        path: 'https://lowkxy.vercel.app/logo-black.png',
+        contentId: 'logo',
+      },
+    ],
   })
+
+  if (sendError) {
+    console.error('Resend send error:', sendError)
+    // Still return success - contact was added, just email failed
+    return NextResponse.json({ success: true })
+  }
 
   return NextResponse.json({ success: true })
 }
