@@ -101,13 +101,8 @@ export default function ComponentsPage() {
         <section className="border-t border-border">
           {/* Hero display */}
           <div className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-            {/* Large background trace logo */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.08]">
-              <IntroLogo size={400} loop={true} />
-            </div>
-
             {/* Center content */}
-            <div className="relative z-10 text-center px-8">
+            <div className="text-center px-8">
               <p className="text-xs font-mono text-muted uppercase tracking-widest mb-8">Logomark</p>
               <div className="flex items-center justify-center gap-3 mb-8">
                 <AnimatedLogo isHovered={true} />
