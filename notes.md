@@ -168,3 +168,30 @@ Added emoji explosion animation when users successfully subscribe to the newslet
 - Per-property transitions with different easing curves = smoother animation
 - Spring physics on X eliminates horizontal jitter
 - Cubic bezier values > 1 cause overshoot/bounce (can cause jitter if not desired)
+
+## 2026-01-16 - Custom Player Icons
+
+Replaced Lucide icons with custom SVG icons for the video player controls.
+
+**Icons created:**
+- `src/components/ui/player-icons.tsx` - React components for all icons
+- `src/icons/` - Source SVG files (9 icons)
+
+**Icons included:**
+- PlayIcon, PauseIcon - playback controls
+- SkipForwardIcon, SkipBackwardIcon - 5-second skip with "5" built into icon
+- SoundFullIcon, SoundMidIcon, SoundOffIcon - volume states
+- ExpandIcon, MinimizeIcon - fullscreen toggle
+
+**Button standardization:**
+- All player control buttons now use `w-8 h-8` (32x32px) containers
+- Consistent hit targets across play/pause, skip, volume, fullscreen buttons
+- Icons use `currentColor` for easy theming via `text-white` class
+
+**Files updated:**
+- `player-controls.tsx` - Play/Pause button
+- `skip-button.tsx` - Skip forward/backward (removed overlaid "5" text span)
+- `volume-slider.tsx` - Volume button
+- `fullscreen-button.tsx` - Expand/Minimize button
+- `hero-overlay.tsx` - Hero play and mute buttons
+- `video-modal.tsx` - Center play/pause feedback overlay

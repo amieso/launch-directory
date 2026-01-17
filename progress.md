@@ -16,6 +16,10 @@
 - [x] Add hero copy update with subscribe CTA
 - [x] Add subscribe input reset after 4 seconds
 - [x] Add animated logo on hover (eye looks around + blinks, 12s loop)
+- [x] Replace Lucide icons with custom player icons
+  - Custom SVG icons for play, pause, skip, volume, expand, minimize
+  - Standardized all player control buttons to 32x32px containers
+  - Updated video modal center play/pause overlay
 
 ## In Progress
 (none)
