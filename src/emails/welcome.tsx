@@ -28,10 +28,10 @@ export function WelcomeEmail({ email }: WelcomeEmailProps) {
           <Section style={logoSection}>
             <Img
               src={LOGO_URL}
-              width="44"
-              height="44"
+              width="32"
+              height="32"
               alt="lowkey"
-              style={{ display: 'block', outline: 'none', border: 'none', textDecoration: 'none' }}
+              style={{ display: 'block', outline: 'none', border: 'none', textDecoration: 'none', opacity: 0.6 }}
             />
           </Section>
 
