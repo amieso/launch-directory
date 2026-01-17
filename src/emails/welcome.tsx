@@ -10,7 +10,7 @@ import {
   Text,
 } from '@react-email/components'
 
-// Use direct URL - CID attachments are unreliable across email clients
+// Direct URL - most reliable for email clients
 const LOGO_URL = 'https://lowkxy.vercel.app/logo-black.png'
 
 interface WelcomeEmailProps {
