@@ -10,7 +10,7 @@ import {
   Text,
 } from '@react-email/components'
 
-// Site URL from environment (defaults for local dev)
+// Site URL from environment
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lowkxy.vercel.app'
 const LOGO_URL = `${SITE_URL}/logo-black.png`
 

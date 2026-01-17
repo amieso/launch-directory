@@ -36,6 +36,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 })
   }
 
+  // Debug: log the site URL being used for email assets
+  console.log('Email SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL || 'https://lowkxy.vercel.app')
+
   const { error: sendError } = await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL || 'lowkey <onboarding@resend.dev>',
     to: email,
