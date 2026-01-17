@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowIcon } from './ui/player-icons'
 import { MorphText } from './ui/morph-text'
 import { EmojiConfetti } from './ui/emoji-confetti'
 
@@ -46,28 +46,26 @@ export function HeroSection() {
   }
 
   return (
-    <section className="px-4 md:px-6 pt-13 pb-16 md:pt-[116px] md:pb-32">
+    <section className="px-4 md:px-6 pt-11 pb-12 md:pt-[116px] md:pb-32">
       <div className="max-w-3xl mx-auto text-center">
-        <p className="text-[12px] font-mono text-muted uppercase tracking-widest mb-7">
+        <p className="text-[10px] md:text-[12px] font-mono text-muted uppercase tracking-widest mb-5 md:mb-7">
           From the makers of Amie
         </p>
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground leading-[1.1] tracking-tight">
           <MorphText prefix="Find your next" words={ROTATING_WORDS} />
         </h1>
-        <p className="mt-4 text-lg text-muted leading-relaxed max-w-xl mx-auto">
+        <p className="mt-4 text-base md:text-lg text-muted leading-relaxed max-w-xl mx-auto">
           A curated collection of the best product launch videos. Subscribe to get the latest launches delivered to your inbox.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-10 flex justify-center mx-auto">
-          <div className="flex flex-col gap-1">
-            <div className="relative">
+        <form onSubmit={handleSubmit} className="mt-8 md:mt-10 w-full md:w-auto flex justify-center">
+          <div className="flex flex-col gap-1 w-full md:w-auto">
+            <div className="relative flex justify-center">
               <EmojiConfetti trigger={status === 'success'} />
               <div
-                className="relative h-10 rounded-full overflow-hidden bg-foreground/5"
-              style={{
-                width: status === 'success' ? 156 : 288,
-                transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1)'
-              }}
+              className={`relative h-10 rounded-full overflow-hidden bg-foreground/5 transition-all duration-300 ${
+                status === 'success' ? 'w-[156px]' : 'w-full md:w-[288px]'
+              }`}
             >
               <input
                 type="email"
@@ -114,7 +112,7 @@ export function HeroSection() {
                 {status === 'loading' ? (
                   <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
                 ) : (
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowIcon className="w-4 h-4" />
                 )}
               </button>
               </div>

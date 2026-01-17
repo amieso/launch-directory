@@ -195,3 +195,100 @@ Replaced Lucide icons with custom SVG icons for the video player controls.
 - `fullscreen-button.tsx` - Expand/Minimize button
 - `hero-overlay.tsx` - Hero play and mute buttons
 - `video-modal.tsx` - Center play/pause feedback overlay
+
+## 2026-01-17 - Intro Animation (WIP)
+
+Added intro animation sequence that plays on first visit. Logo traces in center, blinks, then transitions to header.
+
+**Current implementation:**
+- `IntroAnimation` component shows centered `IntroLogo` (160px) with stroke trace animation
+- After trace + blink, header mounts and `AnimatedLogo` (44px) animates from center position
+- Two separate DOM elements crossfade during "settling" phase
+
+**Known issue - handoff blip:**
+The transition from IntroLogo → AnimatedLogo creates a visible jump because:
+1. Two separate DOM nodes - crossfade doesn't perfectly align
+2. Stroke-width mismatch - scaling 160px→44px makes IntroLogo strokes thinner, AnimatedLogo has full weight at 44px
+3. Position calculation is approximate (`window.innerHeight / 2 - 52`)
+
+**Failed fix attempt (reverted):**
+- Tried creating single `LogoSprite` + `LogoConductor` components
+- Issues: logo didn't appear in center, wrong stroke weight, wrong settle position
+- Reverted with git checkout (should have used /rewind)
+
+**What would fix it (from Codex analysis):**
+- Single DOM element throughout entire animation (no handoff)
+- `vectorEffect="non-scaling-stroke"` on SVG paths to keep stroke width constant when scaled
+- `getBoundingClientRect()` to measure exact header position instead of calculating
+- Position mode flip: animate with `position: fixed`, then switch to `position: relative` in `onAnimationComplete`
+
+## 2026-01-17 - Footer Experiments (Abandoned)
+
+Tried several footer designs, all reverted:
+
+1. **Large wordmark with animated eye** - "lowkey" text edge-to-edge with eye logo replacing "o"
+   - Issue: Didn't look good, affected navbar logo somehow
+
+2. **Scroll-driven eye logo** - Ghost logo that grows 120px→320px and traces in as you scroll
+   - Issue: Animation didn't feel right
+
+3. **Ticker marquee** - Logo + wordmark repeated, scrolling horizontally
+   - Issue: Didn't look good
+
+4. **Text ticker** - "YOU HAVE REACHED THE FOOTER · LOWKEY™" scrolling
+   - Issue: Too much, not needed
+
+**Decision:** Keep simple footer with just links and copyright. Don't over-engineer it.
+
+## 2026-01-17 - Mobile View Implementation
+
+Comprehensive mobile responsiveness pass. Base device: iPhone 14 (390px width).
+
+**Approach:**
+- Mobile-first: base styles for mobile, `sm:` / `md:` prefixes for larger screens
+- Breakpoints used: `sm: 640px`, `md: 768px`
+- No custom breakpoints - stick to Tailwind defaults
+
+**Key patterns:**
+
+1. **Full-width inputs on mobile:**
+   ```tsx
+   className="w-full md:w-[288px]"  // Full on mobile, fixed on desktop
+   ```
+
+2. **Stacking layouts:**
+   ```tsx
+   className="flex flex-col sm:flex-row"  // Stack on mobile, row on desktop
+   ```
+
+3. **Conditional rendering by breakpoint:**
+   ```tsx
+   // Mobile-only element
+   className="sm:hidden"
+   // Desktop-only element
+   className="hidden sm:inline-flex"
+   ```
+
+4. **Hover states on touch devices:**
+   - Hide hover overlays on mobile (`hidden md:flex`) since touch has no hover
+   - Don't rely on hover for essential functionality
+
+5. **Scaling sizes:**
+   ```tsx
+   className="text-lg md:text-2xl"  // Smaller on mobile
+   className="w-16 h-16 sm:w-20 sm:h-20"  // Scale icons
+   ```
+
+**Files modified:**
+- `hero-section.tsx` - Input width, text sizes, spacing
+- `video-card.tsx` - Hide hover overlay on mobile
+- `video-modal.tsx` - Stack title bar, dual Visit buttons (mobile below video, desktop in header)
+- `header.tsx` - Reduce top padding
+- `footer.tsx` - Stack links vertically
+- `video-grid.tsx` - Tighter gap
+
+**Design decision - Visit button:**
+Created two separate Visit button elements rather than repositioning one:
+- Desktop: `hidden sm:inline-flex` in title bar (row layout)
+- Mobile: `sm:hidden mt-6 w-full` below video (full-width, 24px margin)
+This avoids complex positioning logic and keeps each layout clean.

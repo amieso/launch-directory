@@ -5,12 +5,13 @@ import { useRef, useEffect } from 'react'
 interface IntroLogoProps {
   size?: number
   shouldBlink?: boolean
+  loop?: boolean
 }
 
 // Stable counter outside component to survive StrictMode remounts
 let instanceCounter = 0
 
-export function IntroLogo({ size = 160, shouldBlink = false }: IntroLogoProps) {
+export function IntroLogo({ size = 160, shouldBlink = false, loop = false }: IntroLogoProps) {
   // Use ref to keep same ID across StrictMode remounts
   const idRef = useRef<string | null>(null)
   if (idRef.current === null) {
@@ -81,6 +82,10 @@ export function IntroLogo({ size = 160, shouldBlink = false }: IntroLogoProps) {
               from { opacity: 0.12; }
               to { opacity: 0; }
             }
+            @keyframes ghostLoop-${id} {
+              0%, 85% { opacity: 0.12; }
+              95%, 100% { opacity: 0; }
+            }
 
             .trace-outer-${id} {
               stroke-dasharray: 44;
@@ -101,12 +106,58 @@ export function IntroLogo({ size = 160, shouldBlink = false }: IntroLogoProps) {
               opacity: 0.12;
               animation: ghostFade-${id} 0.3s ease-out 1.85s forwards;
             }
+
+            /* Looping variants - 5s total cycle */
+            /* Timing: trace 0-40%, hold 40-75%, fade 75-90%, hidden 90-100% */
+            @keyframes traceOuterLoop-${id} {
+              0% { stroke-dashoffset: -44; opacity: 1; }
+              14% { stroke-dashoffset: -44; opacity: 1; }
+              38% { stroke-dashoffset: 0; opacity: 1; }
+              75% { stroke-dashoffset: 0; opacity: 1; }
+              90% { stroke-dashoffset: 0; opacity: 0; }
+              100% { stroke-dashoffset: -44; opacity: 0; }
+            }
+            @keyframes traceEyeLoop-${id} {
+              0% { stroke-dashoffset: 50; opacity: 1; }
+              6% { stroke-dashoffset: 50; opacity: 1; }
+              26% { stroke-dashoffset: 0; opacity: 1; }
+              75% { stroke-dashoffset: 0; opacity: 1; }
+              90% { stroke-dashoffset: 0; opacity: 0; }
+              100% { stroke-dashoffset: 50; opacity: 0; }
+            }
+            @keyframes tracePupilLoop-${id} {
+              0% { stroke-dashoffset: -19; opacity: 1; }
+              16% { stroke-dashoffset: 0; opacity: 1; }
+              75% { stroke-dashoffset: 0; opacity: 1; }
+              90% { stroke-dashoffset: 0; opacity: 0; }
+              100% { stroke-dashoffset: -19; opacity: 0; }
+            }
+            @keyframes ghostLayerLoop-${id} {
+              0%, 90% { opacity: 0.12; }
+              100% { opacity: 0.12; }
+            }
+
+            .trace-outer-loop-${id} {
+              stroke-dasharray: 44;
+              animation: traceOuterLoop-${id} 5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+            }
+            .trace-eye-loop-${id} {
+              stroke-dasharray: 50;
+              animation: traceEyeLoop-${id} 5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+            }
+            .trace-pupil-loop-${id} {
+              stroke-dasharray: 19;
+              animation: tracePupilLoop-${id} 5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+            }
+            .ghost-layer-loop-${id} {
+              animation: ghostLayerLoop-${id} 5s ease-out infinite;
+            }
           `}
         </style>
       </defs>
 
       {/* Ghost layer - faint preview that fades after trace */}
-      <g className={`ghost-layer-${id}`}>
+      <g className={loop ? `ghost-layer-loop-${id}` : `ghost-layer-${id}`}>
         <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="2" fill="none" />
         <path d={eyeOpen} stroke="currentColor" strokeWidth="2" fill="none" />
         <circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -114,7 +165,7 @@ export function IntroLogo({ size = 160, shouldBlink = false }: IntroLogoProps) {
 
       {/* Outer circle - traces in last */}
       <circle
-        className={`trace-outer-${id}`}
+        className={loop ? `trace-outer-loop-${id}` : `trace-outer-${id}`}
         cx="8"
         cy="8"
         r="7"
@@ -125,7 +176,7 @@ export function IntroLogo({ size = 160, shouldBlink = false }: IntroLogoProps) {
 
       {/* Eye shape - traces in second, morphs for blink */}
       <path
-        className={`trace-eye-${id}`}
+        className={loop ? `trace-eye-loop-${id}` : `trace-eye-${id}`}
         d={eyeOpen}
         stroke="currentColor"
         strokeWidth="2"
@@ -148,7 +199,7 @@ export function IntroLogo({ size = 160, shouldBlink = false }: IntroLogoProps) {
       {/* Pupil - clipped by eye shape */}
       <g clipPath={`url(#${clipId})`}>
         <circle
-          className={`trace-pupil-${id}`}
+          className={loop ? `trace-pupil-loop-${id}` : `trace-pupil-${id}`}
           cx="8"
           cy="8"
           r="3"

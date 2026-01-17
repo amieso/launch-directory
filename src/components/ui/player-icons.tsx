@@ -82,3 +82,11 @@ export function SkipBackwardIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function ArrowIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 9.9999H17M17 9.9999L11.7751 4.3999M17 9.9999L11.7751 15.5999" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}

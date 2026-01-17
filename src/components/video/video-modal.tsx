@@ -123,8 +123,8 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title bar */}
-        <div className="flex justify-between items-center mb-6 px-1.5">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-7 sm:mb-6 px-1.5 items-center sm:items-start">
+          <div className="flex flex-col gap-1.5 sm:gap-2 items-center sm:items-start text-center sm:text-left">
             <motion.span
               className="text-xs text-muted tracking-widest uppercase font-mono"
               initial={{ opacity: 0, y: -10 }}
@@ -139,7 +139,7 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
             </motion.span>
             <motion.h2
               id="modal-title"
-              className="text-2xl font-light text-foreground tracking-tight"
+              className="text-xl sm:text-2xl font-light text-foreground tracking-tight"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
@@ -151,12 +151,13 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
               {video.title}
             </motion.h2>
           </div>
+          {/* Visit button - desktop only (in title bar) */}
           {video.websiteUrl && (
             <motion.a
               href={video.websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="h-8 px-3.5 text-sm rounded-full bg-transparent text-foreground border border-border hover:bg-surface inline-flex items-center justify-center font-medium transition-all"
+              className="hidden sm:inline-flex h-8 px-3.5 text-sm rounded-full bg-transparent text-foreground border border-border hover:bg-surface items-center justify-center font-medium transition-all"
               initial={{ opacity: 0, y: -2 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
@@ -194,11 +195,11 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
                 transition={{ duration: 0.15 }}
                 className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
               >
-                <div className="w-20 h-20 rounded-full bg-black/60 flex items-center justify-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/60 flex items-center justify-center">
                   {lastAction === 'play' ? (
-                    <PlayIcon className="w-10 h-10 text-white" />
+                    <PlayIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                   ) : (
-                    <PauseIcon className="w-10 h-10 text-white" />
+                    <PauseIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                   )}
                 </div>
               </motion.div>
@@ -224,6 +225,25 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
             )}
           </motion.div>
         </div>
+
+        {/* Visit button - mobile only (below video) */}
+        {video.websiteUrl && (
+          <motion.a
+            href={video.websiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sm:hidden mt-6 h-10 px-3.5 text-sm rounded-full bg-transparent text-foreground border border-border hover:bg-surface inline-flex items-center justify-center font-medium transition-all w-full"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{
+              enter: { delay: 0.2, duration: 0.25, ease: [0.23, 1, 0.32, 1] },
+              exit: { duration: 0.1, ease: [0.4, 0, 1, 1] }
+            }}
+          >
+            Visit
+          </motion.a>
+        )}
       </motion.div>
     </motion.div>
   )

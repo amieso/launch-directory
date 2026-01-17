@@ -86,18 +86,18 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
             />
           )}
 
-          {/* Dark overlay with company + title on hover */}
-          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-start p-5 pointer-events-none">
-            <span className="text-xs text-white/70 tracking-widest uppercase font-mono">{video.company}</span>
-            <h3 className="text-2xl font-light text-white tracking-tight line-clamp-2 mt-2">{video.title}</h3>
+          {/* Dark overlay with company + title on hover - hidden on touch devices */}
+          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex-col justify-start p-3 md:p-5 pointer-events-none hidden md:flex">
+            <span className="text-[10px] md:text-xs text-white/70 tracking-widest uppercase font-mono">{video.company}</span>
+            <h3 className="text-lg md:text-2xl font-light text-white tracking-tight line-clamp-2 mt-1 md:mt-2">{video.title}</h3>
           </div>
 
         </div>
       </motion.div>
 
       {/* Info below card */}
-      <div className="flex items-center justify-between pt-[14px] pb-1.5">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center justify-between gap-2 pt-[14px] pb-1.5">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <CompanyLink
             company={video.company}
             onClick={(e) => e.stopPropagation()}

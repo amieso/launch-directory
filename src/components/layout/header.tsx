@@ -30,7 +30,7 @@ export function Header() {
       <div className="absolute inset-0 backdrop-blur-[1px] [mask-image:linear-gradient(to_bottom,black_65%,transparent_100%)]" />
       <div className="absolute inset-0 bg-gradient-to-b from-background/70 to-transparent" />
       <div className="relative px-4 md:px-6">
-        <div className="flex h-16 items-center justify-center pt-9">
+        <div className="flex h-16 items-center justify-center pt-6 sm:pt-9">
           {/* Logo - animates from center to header during settling phase */}
           <Link href="/" className="flex items-center">
             <motion.div
