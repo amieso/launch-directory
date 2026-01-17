@@ -15,7 +15,7 @@ export function HeroSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !email.includes('@')) {
-      setErrorMessage('Please enter a valid email')
+      setErrorMessage('Invalid email')
       setStatus('error')
       return
     }
@@ -41,14 +41,14 @@ export function HeroSection() {
       }, 4000)
     } catch {
       setStatus('error')
-      setErrorMessage('Something went wrong. Try again.')
+      setErrorMessage('Email not supported')
     }
   }
 
   return (
     <section className="px-4 md:px-6 pt-[50px] pb-12 md:pt-[116px] md:pb-32">
       <div className="max-w-3xl mx-auto text-center">
-        <p className="text-[14px] md:text-[12px] font-mono text-muted uppercase tracking-widest mb-5 md:mb-7">
+        <p className="text-sm font-mono text-muted uppercase tracking-widest mb-5 md:mb-7">
           From the makers of Amie
         </p>
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground leading-[1.1] tracking-tight">
@@ -59,7 +59,7 @@ export function HeroSection() {
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 md:mt-10 w-full md:w-auto flex justify-center">
-          <div className="flex flex-col gap-1 w-full md:w-auto">
+          <div className="relative w-full md:w-auto">
             <div className="relative flex justify-center">
               <EmojiConfetti trigger={status === 'success'} />
               <div
@@ -117,7 +117,7 @@ export function HeroSection() {
               </button>
               </div>
             </div>
-            {errorMessage && <span className="text-[11px] text-red-500 text-center px-2">{errorMessage}</span>}
+            {errorMessage && <span className="absolute top-full mt-4 left-0 right-0 text-sm text-red-400 text-center">{errorMessage}</span>}
           </div>
         </form>
       </div>

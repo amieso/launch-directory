@@ -342,3 +342,24 @@ Removed `overscroll-behavior: none` from globals.css to enable native pull-to-re
 2. Changed hero input from `text-sm` (14px) to `text-base` (16px)
 
 **Key learning:** iOS requires both the viewport meta AND 16px+ font size to prevent zoom on input focus.
+
+## 2026-01-17 - Disable Rubber-banding
+
+**Goal:** Disable vertical overscroll bounce while keeping swipe-to-navigate gestures.
+
+**Solution:** Added to globals.css on both html and body:
+- `overscroll-behavior-y: none` - Disables vertical rubber-band
+- `-webkit-overflow-scrolling: auto` - Disables iOS momentum scrolling bounce
+
+Horizontal swipe gestures for navigation still work since we only disabled y-axis overscroll.
+
+## 2026-01-17 - Subscribe Error Messages
+
+Improved error handling for newsletter subscription:
+- "Invalid email" - Client-side validation error
+- "Email not supported" - Server error (helps user understand the issue)
+- Error text: `text-sm text-red-400`, 16px below input, absolutely positioned (doesn't push content)
+
+## 2026-01-17 - Tablet Grid Layout
+
+Changed video grid breakpoint from `md:` (768px) to `lg:` (1024px) so tablets/iPad mini show 2 large cards per row instead of jumping to 4 columns.

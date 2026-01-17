@@ -38,6 +38,13 @@
 - [x] Fix iOS input zoom on mobile
   - Added viewport meta with maximumScale=1, userScalable=false
   - Changed hero input from text-sm to text-base (16px prevents iOS auto-zoom)
+- [x] Disable vertical rubber-banding while keeping swipe navigation
+  - Added overscroll-behavior-y: none to html and body
+  - Added -webkit-overflow-scrolling: auto
+- [x] Improve subscribe error messages
+  - "Invalid email" for client validation, "Email not supported" for server errors
+  - Error text absolutely positioned 16px below input
+- [x] Tablet grid layout - 2 columns on iPad mini/tablets (lg breakpoint instead of md)
 
 ## In Progress
 - [ ] Fix intro logo handoff animation (logo jumps during settling phase)

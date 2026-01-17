@@ -29,10 +29,13 @@
     @apply antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: auto;
   }
 
   body {
     @apply bg-background text-foreground text-base leading-normal font-sans;
+    overscroll-behavior-y: none;
   }
 
   /* Smooth theme transitions */

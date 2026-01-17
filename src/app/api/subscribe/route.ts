@@ -17,6 +17,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
   }
 
+  // Test email for error state
+  if (email === 'test@gmail.com') {
+    return NextResponse.json({ error: 'Test error' }, { status: 500 })
+  }
+
   const resend = new Resend(apiKey)
 
   console.log('Creating contact for:', email)
