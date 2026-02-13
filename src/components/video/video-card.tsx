@@ -82,13 +82,21 @@ export const VideoCard = memo(function VideoCard({ video, onSelect, disablePlayb
               className="absolute inset-0 h-full w-full object-cover rounded-[6px]"
             />
           ) : (
-            <video
-              ref={videoRef}
-              muted
-              loop
-              playsInline
-              className="absolute inset-0 h-full w-full object-cover rounded-[6px]"
-            />
+            <>
+              <img
+                src={video.thumbnailUrl}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover rounded-[6px]"
+              />
+              <video
+                ref={videoRef}
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 h-full w-full object-cover rounded-[6px]"
+              />
+            </>
           )}
 
           {/* Hover labels - keep video visible while showing metadata */}
