@@ -22,11 +22,12 @@ interface VideoPlayerProps {
   src: string
   className?: string
   startMuted?: boolean
+  initialTime?: number
   onQualityLevelsChange?: (levels: QualityLevel[]) => void
 }
 
 export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
-  function VideoPlayer({ src, className = '', startMuted = true, onQualityLevelsChange }, ref) {
+  function VideoPlayer({ src, className = '', startMuted = true, initialTime = 0, onQualityLevelsChange }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const hlsRef = useRef<Hls | null>(null)
     const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([])
@@ -60,6 +61,35 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
     useEffect(() => {
       const videoEl = videoRef.current
       if (!videoEl || !src) return
+      let hasAppliedInitialTime = false
+
+      const applyInitialTime = () => {
+        if (hasAppliedInitialTime || !Number.isFinite(initialTime) || initialTime <= 0) return
+
+        const duration = videoEl.duration
+        const maxTime = Number.isFinite(duration) && duration > 0
+          ? Math.max(0, duration - 0.1)
+          : initialTime
+        const targetTime = Math.min(initialTime, maxTime)
+
+        if (targetTime <= 0) {
+          hasAppliedInitialTime = true
+          return
+        }
+
+        try {
+          videoEl.currentTime = targetTime
+          hasAppliedInitialTime = true
+        } catch {
+          // Wait for metadata/canplay and retry
+        }
+      }
+
+      const handleLoadedMetadata = () => {
+        applyInitialTime()
+      }
+
+      videoEl.addEventListener('loadedmetadata', handleLoadedMetadata)
 
       if (Hls.isSupported()) {
         const hls = new Hls()
@@ -74,6 +104,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
           }))
           setQualityLevels(levels)
           onQualityLevelsChange?.(levels)
+          applyInitialTime()
           videoEl.play().catch(() => {})
         })
 
@@ -86,6 +117,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
         })
 
         return () => {
+          videoEl.removeEventListener('loadedmetadata', handleLoadedMetadata)
           hls.destroy()
           hlsRef.current = null
           setQualityLevels([])
@@ -93,9 +125,18 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
       } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS support - no quality control available
         videoEl.src = src
+        applyInitialTime()
         videoEl.play().catch(() => {})
+
+        return () => {
+          videoEl.removeEventListener('loadedmetadata', handleLoadedMetadata)
+        }
       }
-    }, [src, onQualityLevelsChange])
+
+      return () => {
+        videoEl.removeEventListener('loadedmetadata', handleLoadedMetadata)
+      }
+    }, [src, initialTime, onQualityLevelsChange])
 
     return (
       <video

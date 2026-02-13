@@ -13,6 +13,7 @@ export default function CompanyPage() {
   const params = useParams()
   const slug = params.slug as string
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
+  const [selectedStartTime, setSelectedStartTime] = useState(0)
   const [activeLayoutVideoId, setActiveLayoutVideoId] = useState<string | null>(null)
 
   // Filter videos for this company
@@ -28,13 +29,15 @@ export default function CompanyPage() {
   const companyName = firstVideo.company
   const topIndustry = firstVideo.industry
 
-  const handleVideoSelect = (video: Video) => {
+  const handleVideoSelect = (video: Video, startTime: number) => {
     setActiveLayoutVideoId(video.id)
     setSelectedVideo(video)
+    setSelectedStartTime(startTime)
   }
 
   const handleModalClose = () => {
     setSelectedVideo(null)
+    setSelectedStartTime(0)
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur()
     }
@@ -126,6 +129,7 @@ export default function CompanyPage() {
             {selectedVideo && (
               <VideoModal
                 video={selectedVideo}
+                initialTime={selectedStartTime}
                 onClose={handleModalClose}
               />
             )}

@@ -69,17 +69,20 @@ const ghostVideo: Video = {
 
 export default function ComponentsPage() {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
+  const [selectedStartTime, setSelectedStartTime] = useState(0)
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null)
   const [confettiTrigger, setConfettiTrigger] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleVideoSelect = (video: Video) => {
+  const handleVideoSelect = (video: Video, startTime: number) => {
     setSelectedVideo(video)
+    setSelectedStartTime(startTime)
     setLastSelectedId(video.id)
   }
 
   const handleModalClose = () => {
     setSelectedVideo(null)
+    setSelectedStartTime(0)
     setTimeout(() => setLastSelectedId(null), 300)
   }
 
@@ -487,6 +490,7 @@ export default function ComponentsPage() {
         {selectedVideo && (
           <VideoModal
             video={selectedVideo}
+            initialTime={selectedStartTime}
             onClose={handleModalClose}
           />
         )}

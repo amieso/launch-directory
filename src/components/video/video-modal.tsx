@@ -10,6 +10,7 @@ import { getChaptersForVideo } from '@/data/chapters'
 
 interface VideoModalProps {
   video: Video
+  initialTime?: number
   onClose: () => void
 }
 
@@ -18,7 +19,7 @@ const WHEEL_CLOSE_THRESHOLD = 140
 const WHEEL_RESET_MS = 180
 const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const
 
-export function VideoModal({ video, onClose }: VideoModalProps) {
+export function VideoModal({ video, initialTime = 0, onClose }: VideoModalProps) {
   const playerRef = useRef<VideoPlayerHandle>(null)
   const videoContainerRef = useRef<HTMLDivElement>(null)
   const videoElementRef = useRef<HTMLVideoElement | null>(null)
@@ -319,6 +320,7 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
               ref={playerRef}
               src={video.videoUrl}
               startMuted={false}
+              initialTime={initialTime}
               onQualityLevelsChange={setQualityLevels}
             />
 

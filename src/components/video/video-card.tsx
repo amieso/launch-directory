@@ -11,7 +11,7 @@ const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as 
 
 interface VideoCardProps {
   video: Video
-  onSelect: (video: Video) => void
+  onSelect: (video: Video, startTime: number) => void
   disablePlayback?: boolean
 }
 
@@ -42,14 +42,16 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
 
   const handleClick = () => {
     if (!isGhost) {
-      onSelect(video)
+      const currentTime = videoRef.current?.currentTime ?? 0
+      onSelect(video, Number.isFinite(currentTime) ? currentTime : 0)
     }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if ((e.key === 'Enter' || e.key === ' ') && !isGhost) {
       e.preventDefault()
-      onSelect(video)
+      const currentTime = videoRef.current?.currentTime ?? 0
+      onSelect(video, Number.isFinite(currentTime) ? currentTime : 0)
     }
   }
 

@@ -17,6 +17,7 @@ interface VideoGridProps {
 
 export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
+  const [selectedStartTime, setSelectedStartTime] = useState(0)
   const [activeLayoutVideoId, setActiveLayoutVideoId] = useState<string | null>(null)
   const { shouldShowIntro } = useIntroContext()
 
@@ -29,13 +30,15 @@ export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
     '--grid-cols': columns,
   } as React.CSSProperties
 
-  const handleVideoSelect = (video: Video) => {
+  const handleVideoSelect = (video: Video, startTime: number) => {
     setActiveLayoutVideoId(video.id)
     setSelectedVideo(video)
+    setSelectedStartTime(startTime)
   }
 
   const handleModalClose = () => {
     setSelectedVideo(null)
+    setSelectedStartTime(0)
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur()
     }
@@ -79,6 +82,7 @@ export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
         {selectedVideo && (
           <VideoModal
             video={selectedVideo}
+            initialTime={selectedStartTime}
             onClose={handleModalClose}
           />
         )}
