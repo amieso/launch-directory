@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { notFound, useParams } from 'next/navigation'
 import { AnimatePresence, LayoutGroup } from 'framer-motion'
 import { videos } from '@/data/videos'
@@ -14,6 +14,7 @@ export default function CompanyPage() {
   const slug = params.slug as string
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
   const [selectedStartTime, setSelectedStartTime] = useState(0)
+  const [selectedHandoffVideoElement, setSelectedHandoffVideoElement] = useState<HTMLVideoElement | null>(null)
   const [activeLayoutVideoId, setActiveLayoutVideoId] = useState<string | null>(null)
 
   // Filter videos for this company
@@ -29,19 +30,21 @@ export default function CompanyPage() {
   const companyName = firstVideo.company
   const topIndustry = firstVideo.industry
 
-  const handleVideoSelect = (video: Video, startTime: number) => {
+  const handleVideoSelect = useCallback((video: Video, startTime: number, handoffVideoElement?: HTMLVideoElement | null) => {
     setActiveLayoutVideoId(video.id)
     setSelectedVideo(video)
     setSelectedStartTime(startTime)
-  }
+    setSelectedHandoffVideoElement(handoffVideoElement ?? null)
+  }, [])
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setSelectedVideo(null)
     setSelectedStartTime(0)
+    setSelectedHandoffVideoElement(null)
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur()
     }
-  }
+  }, [])
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,6 +133,7 @@ export default function CompanyPage() {
               <VideoModal
                 video={selectedVideo}
                 initialTime={selectedStartTime}
+                handoffVideoElement={selectedHandoffVideoElement}
                 onClose={handleModalClose}
               />
             )}

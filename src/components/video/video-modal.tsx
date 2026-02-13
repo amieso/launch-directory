@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useCallback, useRef, useState, type TouchEvent, type WheelEvent } from 'react'
+import { useEffect, useLayoutEffect, useCallback, useRef, useState, type TouchEvent, type WheelEvent } from 'react'
 import { motion } from 'framer-motion'
 import { PlayIcon, PauseIcon } from '@/components/ui/player-icons'
 import { Video } from '@/types/video'
@@ -11,6 +11,7 @@ import { getChaptersForVideo } from '@/data/chapters'
 interface VideoModalProps {
   video: Video
   initialTime?: number
+  handoffVideoElement?: HTMLVideoElement | null
   onClose: () => void
 }
 
@@ -19,9 +20,10 @@ const WHEEL_CLOSE_THRESHOLD = 140
 const WHEEL_RESET_MS = 180
 const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const
 
-export function VideoModal({ video, initialTime = 0, onClose }: VideoModalProps) {
+export function VideoModal({ video, initialTime = 0, handoffVideoElement = null, onClose }: VideoModalProps) {
   const playerRef = useRef<VideoPlayerHandle>(null)
   const videoContainerRef = useRef<HTMLDivElement>(null)
+  const handoffHostRef = useRef<HTMLDivElement>(null)
   const videoElementRef = useRef<HTMLVideoElement | null>(null)
   const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const wheelDeltaRef = useRef(0)
@@ -88,8 +90,55 @@ export function VideoModal({ video, initialTime = 0, onClose }: VideoModalProps)
     }
   }, [handleEscape])
 
+  useLayoutEffect(() => {
+    if (!handoffVideoElement || !handoffHostRef.current) return
+
+    const videoEl = handoffVideoElement
+    const originalParent = videoEl.parentElement
+    const originalNextSibling = videoEl.nextSibling
+    if (!originalParent) return
+
+    const targetTime = Number.isFinite(initialTime) ? initialTime : 0
+
+    handoffHostRef.current.appendChild(videoEl)
+    videoEl.muted = false
+
+    if (targetTime > 0 && Math.abs(videoEl.currentTime - targetTime) > 0.25) {
+      try {
+        videoEl.currentTime = targetTime
+      } catch {
+        // Ignore seek errors while metadata is resolving.
+      }
+    }
+
+    videoElementRef.current = videoEl
+    setVideoElement(videoEl)
+    setQualityLevels([])
+    setCurrentQuality(-1)
+    videoEl.play().catch(() => {})
+
+    return () => {
+      videoEl.muted = true
+
+      if (originalParent.isConnected) {
+        if (originalNextSibling && originalNextSibling.parentNode === originalParent) {
+          originalParent.insertBefore(videoEl, originalNextSibling)
+        } else {
+          originalParent.appendChild(videoEl)
+        }
+      }
+
+      videoEl.play().catch(() => {})
+      if (videoElementRef.current === videoEl) {
+        videoElementRef.current = null
+      }
+    }
+  }, [handoffVideoElement, initialTime])
+
   // Get video element reference after mount and sync play state
   useEffect(() => {
+    if (handoffVideoElement) return
+
     const checkVideoElement = () => {
       const el = playerRef.current?.getVideoElement()
       if (el) {
@@ -100,7 +149,7 @@ export function VideoModal({ video, initialTime = 0, onClose }: VideoModalProps)
     // Small delay to ensure player is mounted
     const timeout = setTimeout(checkVideoElement, 100)
     return () => clearTimeout(timeout)
-  }, [video.id])
+  }, [video.id, handoffVideoElement])
 
   // Sync isPlaying state with actual video state
   useEffect(() => {
@@ -316,13 +365,17 @@ export function VideoModal({ video, initialTime = 0, onClose }: VideoModalProps)
                 </div>
               </motion.div>
             )}
-            <VideoPlayer
-              ref={playerRef}
-              src={video.videoUrl}
-              startMuted={false}
-              initialTime={initialTime}
-              onQualityLevelsChange={setQualityLevels}
-            />
+            {handoffVideoElement ? (
+              <div ref={handoffHostRef} className="absolute inset-0" />
+            ) : (
+              <VideoPlayer
+                ref={playerRef}
+                src={video.videoUrl}
+                startMuted={false}
+                initialTime={initialTime}
+                onQualityLevelsChange={setQualityLevels}
+              />
+            )}
 
             {/* Player controls */}
             {videoElement && (

@@ -6,16 +6,17 @@ import Hls from 'hls.js'
 import { Video } from '@/types/video'
 import { formatDuration } from '@/lib/utils'
 import { CompanyLink } from '@/components/ui/company-link'
+import { memo } from 'react'
 
 const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const
 
 interface VideoCardProps {
   video: Video
-  onSelect: (video: Video, startTime: number) => void
+  onSelect: (video: Video, startTime: number, handoffVideoElement?: HTMLVideoElement | null) => void
   disablePlayback?: boolean
 }
 
-export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCardProps) {
+export const VideoCard = memo(function VideoCard({ video, onSelect, disablePlayback = false }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const isGhost = !video.videoUrl
 
@@ -43,7 +44,7 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
   const handleClick = () => {
     if (!isGhost) {
       const currentTime = videoRef.current?.currentTime ?? 0
-      onSelect(video, Number.isFinite(currentTime) ? currentTime : 0)
+      onSelect(video, Number.isFinite(currentTime) ? currentTime : 0, videoRef.current)
     }
   }
 
@@ -51,7 +52,7 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
     if ((e.key === 'Enter' || e.key === ' ') && !isGhost) {
       e.preventDefault()
       const currentTime = videoRef.current?.currentTime ?? 0
-      onSelect(video, Number.isFinite(currentTime) ? currentTime : 0)
+      onSelect(video, Number.isFinite(currentTime) ? currentTime : 0, videoRef.current)
     }
   }
 
@@ -117,4 +118,4 @@ export function VideoCard({ video, onSelect, disablePlayback = false }: VideoCar
       </div>
     </article>
   )
-}
+})

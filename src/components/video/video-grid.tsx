@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { Video } from '@/types/video'
 import { VideoCard } from './video-card'
@@ -18,6 +18,7 @@ interface VideoGridProps {
 export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
   const [selectedStartTime, setSelectedStartTime] = useState(0)
+  const [selectedHandoffVideoElement, setSelectedHandoffVideoElement] = useState<HTMLVideoElement | null>(null)
   const [activeLayoutVideoId, setActiveLayoutVideoId] = useState<string | null>(null)
   const { shouldShowIntro } = useIntroContext()
 
@@ -30,19 +31,21 @@ export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
     '--grid-cols': columns,
   } as React.CSSProperties
 
-  const handleVideoSelect = (video: Video, startTime: number) => {
+  const handleVideoSelect = useCallback((video: Video, startTime: number, handoffVideoElement?: HTMLVideoElement | null) => {
     setActiveLayoutVideoId(video.id)
     setSelectedVideo(video)
     setSelectedStartTime(startTime)
-  }
+    setSelectedHandoffVideoElement(handoffVideoElement ?? null)
+  }, [])
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setSelectedVideo(null)
     setSelectedStartTime(0)
+    setSelectedHandoffVideoElement(null)
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur()
     }
-  }
+  }, [])
 
   if (videos.length === 0) {
     return (
@@ -83,6 +86,7 @@ export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
           <VideoModal
             video={selectedVideo}
             initialTime={selectedStartTime}
+            handoffVideoElement={selectedHandoffVideoElement}
             onClose={handleModalClose}
           />
         )}
