@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import Hls from 'hls.js'
 import { Video } from '@/types/video'
@@ -19,6 +19,11 @@ interface VideoCardProps {
 export const VideoCard = memo(function VideoCard({ video, onSelect, disablePlayback = false }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const isGhost = !video.videoUrl
+  const [hasRenderedFrame, setHasRenderedFrame] = useState(false)
+
+  useEffect(() => {
+    setHasRenderedFrame(false)
+  }, [video.id])
 
   useEffect(() => {
     if (isGhost || disablePlayback) return
@@ -40,6 +45,26 @@ export const VideoCard = memo(function VideoCard({ video, onSelect, disablePlayb
       videoEl.play().catch(() => {})
     }
   }, [video.videoUrl, isGhost, disablePlayback])
+
+  useEffect(() => {
+    if (isGhost || disablePlayback) return
+    const videoEl = videoRef.current
+    if (!videoEl) return
+
+    const markRendered = () => setHasRenderedFrame(true)
+
+    if (videoEl.readyState >= 2) {
+      setHasRenderedFrame(true)
+    }
+
+    videoEl.addEventListener('loadeddata', markRendered)
+    videoEl.addEventListener('playing', markRendered)
+
+    return () => {
+      videoEl.removeEventListener('loadeddata', markRendered)
+      videoEl.removeEventListener('playing', markRendered)
+    }
+  }, [video.id, isGhost, disablePlayback])
 
   const handleClick = () => {
     if (!isGhost) {
@@ -87,7 +112,7 @@ export const VideoCard = memo(function VideoCard({ video, onSelect, disablePlayb
                 src={video.thumbnailUrl}
                 alt=""
                 aria-hidden="true"
-                className="absolute inset-0 h-full w-full object-cover rounded-[6px]"
+                className={`absolute inset-0 h-full w-full object-cover rounded-[6px] transition-opacity duration-200 ${hasRenderedFrame ? 'opacity-0' : 'opacity-100'}`}
               />
               <video
                 ref={videoRef}
