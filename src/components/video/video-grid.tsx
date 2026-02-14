@@ -76,6 +76,7 @@ export function VideoGrid({ videos, columns = 4 }: VideoGridProps) {
             <VideoCard
               video={video}
               onSelect={handleVideoSelect}
+              isLayoutActive={activeLayoutVideoId === video.id}
             />
           </motion.div>
         ))}

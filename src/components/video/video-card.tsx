@@ -14,9 +14,15 @@ interface VideoCardProps {
   video: Video
   onSelect: (video: Video, startTime: number, handoffVideoElement?: HTMLVideoElement | null) => void
   disablePlayback?: boolean
+  isLayoutActive?: boolean
 }
 
-export const VideoCard = memo(function VideoCard({ video, onSelect, disablePlayback = false }: VideoCardProps) {
+export const VideoCard = memo(function VideoCard({
+  video,
+  onSelect,
+  disablePlayback = false,
+  isLayoutActive = false,
+}: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const isGhost = !video.videoUrl
   const [hasRenderedFrame, setHasRenderedFrame] = useState(false)
@@ -112,7 +118,9 @@ export const VideoCard = memo(function VideoCard({ video, onSelect, disablePlayb
                 src={video.thumbnailUrl}
                 alt=""
                 aria-hidden="true"
-                className={`absolute inset-0 h-full w-full object-cover rounded-[6px] transition-opacity duration-200 ${hasRenderedFrame ? 'opacity-0' : 'opacity-100'}`}
+                className={`absolute inset-0 h-full w-full object-cover rounded-[6px] transition-opacity duration-200 ${
+                  hasRenderedFrame && !isLayoutActive ? 'opacity-0' : 'opacity-100'
+                }`}
               />
               <video
                 ref={videoRef}

@@ -122,6 +122,7 @@ export default function CompanyPage() {
                 <VideoCard
                   video={video}
                   onSelect={handleVideoSelect}
+                  isLayoutActive={activeLayoutVideoId === video.id}
                 />
               </div>
             ))}
