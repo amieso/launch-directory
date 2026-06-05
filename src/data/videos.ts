@@ -3,7 +3,7 @@ import { Video } from '@/types/video'
 export const videos: Video[] = [
   {
     id: '1',
-    slug: 'lovable',
+    slug: 'launch',
     companySlug: 'lovable',
     title: 'Lovable Launch',
     company: 'Lovable',
@@ -29,7 +29,7 @@ export const videos: Video[] = [
   },
   {
     id: '2',
-    slug: 'lightfield',
+    slug: 'announcement',
     companySlug: 'lightfield',
     title: 'Lightfield Announcement',
     company: 'Lightfield',
@@ -53,7 +53,7 @@ export const videos: Video[] = [
   },
   {
     id: '3',
-    slug: 'chatgpt-atlas',
+    slug: 'atlas',
     companySlug: 'openai',
     title: 'ChatGPT Atlas Browser',
     company: 'OpenAI',
@@ -79,7 +79,7 @@ export const videos: Video[] = [
   },
   {
     id: '4',
-    slug: 'cluely',
+    slug: 'demo',
     companySlug: 'cluely',
     title: 'Cluely Demo',
     company: 'Cluely',
@@ -104,7 +104,7 @@ export const videos: Video[] = [
   },
   {
     id: '5',
-    slug: 'dia-arc',
+    slug: 'dia',
     companySlug: 'the-browser-company',
     title: 'Dia - Arc Members',
     company: 'The Browser Company',
@@ -130,7 +130,7 @@ export const videos: Video[] = [
   },
   {
     id: '6',
-    slug: 'bump-app',
+    slug: 'launch',
     companySlug: 'bump',
     title: 'Bump Launch',
     company: 'Bump',
@@ -155,7 +155,7 @@ export const videos: Video[] = [
   },
   {
     id: '7',
-    slug: 'ray-bloom',
+    slug: 'ray',
     companySlug: 'bloom-ai',
     title: 'Ray by Bloom AI',
     company: 'Bloom AI',
@@ -179,7 +179,7 @@ export const videos: Video[] = [
   },
   {
     id: '8',
-    slug: 'elevenlabs',
+    slug: 'announcement',
     companySlug: 'elevenlabs',
     title: 'ElevenLabs Announcement',
     company: 'ElevenLabs',
@@ -205,7 +205,7 @@ export const videos: Video[] = [
   },
   {
     id: '9',
-    slug: 'human-interface',
+    slug: 'series-b',
     companySlug: 'human-interface',
     title: 'Human Interface Series B',
     company: 'Human Interface',
@@ -229,7 +229,7 @@ export const videos: Video[] = [
   },
   {
     id: '10',
-    slug: 'fundraising-update',
+    slug: 'funding',
     companySlug: 'stealth-startup',
     title: '$3M Funding Announcement',
     company: 'Stealth Startup',
@@ -251,7 +251,7 @@ export const videos: Video[] = [
   },
   {
     id: '11',
-    slug: 'furqan-vc-world',
+    slug: 'vc-misstep',
     companySlug: 'f.inc',
     title: 'The VC World Has Made A Misstep',
     company: 'F.inc',
@@ -276,7 +276,7 @@ export const videos: Video[] = [
   },
   {
     id: '12',
-    slug: 'amie-launch',
+    slug: 'launch',
     companySlug: 'amie',
     title: 'Amie Launch',
     company: 'Amie',
@@ -303,7 +303,7 @@ export const videos: Video[] = [
   // Ghost cards - coming soon
   {
     id: '13',
-    slug: 'delphi',
+    slug: 'clone',
     companySlug: 'delphi',
     title: 'Delphi Clone Launch',
     company: 'Delphi',
@@ -326,7 +326,7 @@ export const videos: Video[] = [
   },
   {
     id: '14',
-    slug: 'cosmos',
+    slug: 'browser',
     companySlug: 'cosmos',
     title: 'Cosmos Browser',
     company: 'Cosmos',
@@ -349,7 +349,7 @@ export const videos: Video[] = [
   },
   {
     id: '15',
-    slug: 'arena',
+    slug: 'channels',
     companySlug: 'are.na',
     title: 'Are.na Channels',
     company: 'Are.na',
@@ -372,7 +372,7 @@ export const videos: Video[] = [
   },
   {
     id: '16',
-    slug: 'supabase',
+    slug: 'studio',
     companySlug: 'supabase',
     title: 'Supabase Studio',
     company: 'Supabase',
@@ -395,7 +395,7 @@ export const videos: Video[] = [
   },
   {
     id: '17',
-    slug: 'notion-calendar',
+    slug: 'calendar',
     companySlug: 'notion',
     title: 'Notion Calendar',
     company: 'Notion',
@@ -418,7 +418,7 @@ export const videos: Video[] = [
   },
   {
     id: '18',
-    slug: 'vercel-v0',
+    slug: 'v0',
     companySlug: 'vercel',
     title: 'v0 by Vercel',
     company: 'Vercel',
@@ -441,7 +441,7 @@ export const videos: Video[] = [
   },
   {
     id: '19',
-    slug: 'perplexity',
+    slug: 'pro',
     companySlug: 'perplexity',
     title: 'Perplexity Pro',
     company: 'Perplexity',
@@ -464,7 +464,7 @@ export const videos: Video[] = [
   },
   {
     id: '20',
-    slug: 'framer',
+    slug: 'sites',
     companySlug: 'framer',
     title: 'Framer Sites',
     company: 'Framer',
@@ -487,7 +487,7 @@ export const videos: Video[] = [
   },
   {
     id: '21',
-    slug: 'resend',
+    slug: 'email',
     companySlug: 'resend',
     title: 'Resend Email',
     company: 'Resend',
@@ -510,7 +510,7 @@ export const videos: Video[] = [
   },
   {
     id: '22',
-    slug: 'cal',
+    slug: 'atoms',
     companySlug: 'cal.com',
     title: 'Cal.com Atoms',
     company: 'Cal.com',
@@ -533,7 +533,7 @@ export const videos: Video[] = [
   },
   {
     id: '23',
-    slug: 'loom',
+    slug: 'ai',
     companySlug: 'loom',
     title: 'Loom AI',
     company: 'Loom',
@@ -556,7 +556,7 @@ export const videos: Video[] = [
   },
   {
     id: '24',
-    slug: 'pitch',
+    slug: 'decks',
     companySlug: 'pitch',
     title: 'Pitch Decks',
     company: 'Pitch',
