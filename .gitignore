@@ -7,3 +7,10 @@ node_modules
 .vercel
 tsconfig.tsbuildinfo
 videoDirectory
+
+# Video ingest pipeline (scripts/)
+/uploads
+/scripts/.ingest-state.json
+
+# Claude Code transient files
+.claude/scheduled_tasks.lock

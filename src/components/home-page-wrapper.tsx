@@ -11,7 +11,7 @@ interface HomePageWrapperProps {
 
 function HomePageContent({ children }: HomePageWrapperProps) {
   const { shouldShowIntro: showIntroFromHook, isLoading, markAsSeen } = useFirstVisit()
-  const { setIntroComplete, setShouldShowIntro, contentReady, setContentReady } = useIntroContext()
+  const { setIntroComplete, setShouldShowIntro, setContentReady } = useIntroContext()
 
   // Once intro starts, commit to intro path - prevents remount when markAsSeen runs
   // This fixes double-loading: without this, markAsSeen() changes showIntroFromHook to false,
@@ -49,16 +49,18 @@ function HomePageContent({ children }: HomePageWrapperProps) {
     return <>{children}</>
   }
 
-  // Intro path - once started, stay here even after markAsSeen runs
-  // Children mount when contentReady (when settling starts at 2.3s)
-  // This allows Header logo to animate from center during settling
+  // Intro path - once started, stay here even after markAsSeen runs.
+  // Children mount immediately (behind the opaque overlay) so the visible
+  // previews load while the logo traces — the intro then holds its reveal
+  // until they've painted. The header logo and grid animate off the intro
+  // phase (not mount), so they still fly in at the settling reveal.
   return (
     <>
       <IntroAnimation
         onComplete={handleIntroComplete}
         onContentReady={handleContentReady}
       />
-      {contentReady && children}
+      {children}
     </>
   )
 }

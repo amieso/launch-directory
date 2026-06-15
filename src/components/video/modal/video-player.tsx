@@ -16,6 +16,8 @@ export interface VideoPlayerHandle {
   getQualityLevels: () => QualityLevel[]
   getCurrentQuality: () => number
   setQuality: (index: number) => void
+  /** Pre-fetch the top rendition (hover/expand) so it's already sharp by click. */
+  setUpscale: (on: boolean) => void
 }
 
 interface VideoPlayerProps {
@@ -23,13 +25,23 @@ interface VideoPlayerProps {
   className?: string
   startMuted?: boolean
   initialTime?: number
+  /** Expanded (watching) vs collapsed grid preview — deepens the buffer when true. */
+  expanded?: boolean
+  /** Another video is focused — freeze segment loading so the focused player gets the whole pipe. */
+  backgrounded?: boolean
   onQualityLevelsChange?: (levels: QualityLevel[]) => void
 }
 
+// Shallow buffer for looping grid previews (less wasted data); deeper once a
+// video is expanded and actually being watched.
+const PREVIEW_BUFFER_LENGTH = 6
+const WATCHING_BUFFER_LENGTH = 30
+
 export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
-  function VideoPlayer({ src, className = '', startMuted = true, initialTime = 0, onQualityLevelsChange }, ref) {
+  function VideoPlayer({ src, className = '', startMuted = true, initialTime = 0, expanded = false, backgrounded = false, onQualityLevelsChange }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const hlsRef = useRef<Hls | null>(null)
+    const upscaleRef = useRef(false)
     const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([])
     const [currentQuality, setCurrentQuality] = useState(-1) // -1 = auto
 
@@ -44,6 +56,27 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
       }
     }, [])
 
+    // Lift the player-size cap and queue the top rendition so the high-quality
+    // segments are buffered before the card is even clicked. Reverting drops
+    // back to size-capped auto. No-op until levels are known (re-applied on
+    // MANIFEST_PARSED), and harmless on Safari's native HLS (no hls instance).
+    const applyUpscale = useCallback(() => {
+      const hls = hlsRef.current
+      if (!hls || hls.levels.length === 0) return
+      if (upscaleRef.current) {
+        hls.config.capLevelToPlayerSize = false
+        hls.nextLevel = hls.levels.length - 1
+      } else {
+        hls.nextLevel = -1
+        hls.config.capLevelToPlayerSize = true
+      }
+    }, [])
+
+    const setUpscale = useCallback((on: boolean) => {
+      upscaleRef.current = on
+      applyUpscale()
+    }, [applyUpscale])
+
     useImperativeHandle(ref, () => ({
       play: () => videoRef.current?.play().catch(() => {}),
       pause: () => videoRef.current?.pause(),
@@ -56,7 +89,8 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
       getQualityLevels,
       getCurrentQuality,
       setQuality,
-    }), [getQualityLevels, getCurrentQuality, setQuality])
+      setUpscale,
+    }), [getQualityLevels, getCurrentQuality, setQuality, setUpscale])
 
     useEffect(() => {
       const videoEl = videoRef.current
@@ -92,7 +126,17 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
       videoEl.addEventListener('loadedmetadata', handleLoadedMetadata)
 
       if (Hls.isSupported()) {
-        const hls = new Hls()
+        const hls = new Hls({
+          // Start at the lowest rendition so the first frame paints fast, then
+          // let ABR ramp up. The biggest perceptible-load win for the grid.
+          startLevel: 0,
+          // Never fetch a rendition larger than the element: tiny in the grid,
+          // full resolution once expanded — adjusts automatically, no reload.
+          capLevelToPlayerSize: true,
+          // Skip the bandwidth probe; commit to the start level immediately.
+          testBandwidth: false,
+          maxBufferLength: PREVIEW_BUFFER_LENGTH,
+        })
         hlsRef.current = hls
         hls.loadSource(src)
         hls.attachMedia(videoEl)
@@ -105,6 +149,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
           setQualityLevels(levels)
           onQualityLevelsChange?.(levels)
           applyInitialTime()
+          applyUpscale()
           videoEl.play().catch(() => {})
         })
 
@@ -136,7 +181,26 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
       return () => {
         videoEl.removeEventListener('loadedmetadata', handleLoadedMetadata)
       }
-    }, [src, initialTime, onQualityLevelsChange])
+    }, [src, initialTime, onQualityLevelsChange, applyUpscale])
+
+    // Deepen the buffer once expanded (and shrink it back on collapse) by
+    // mutating the live config — HLS.js reads this continuously, so no reload.
+    useEffect(() => {
+      const hls = hlsRef.current
+      if (!hls) return
+      hls.config.maxBufferLength = expanded ? WATCHING_BUFFER_LENGTH : PREVIEW_BUFFER_LENGTH
+    }, [expanded])
+
+    // While another video is focused, halt this player's segment fetching so the
+    // focused player gets the entire bandwidth budget — the grid previews are
+    // hidden behind the backdrop anyway. Resume the moment nothing else is
+    // focused. No-op on Safari's native HLS (no hls instance to control).
+    useEffect(() => {
+      const hls = hlsRef.current
+      if (!hls) return
+      if (backgrounded) hls.stopLoad()
+      else hls.startLoad()
+    }, [backgrounded])
 
     return (
       <video

@@ -36,6 +36,14 @@
 }
 
 @layer utilities {
+  /* Suppress focus rings inside the video grid and the expanded lightbox.
+     Keyboard navigation still works — the default outline just looks bad
+     layered over thumbnails and player chrome. */
+  .no-focus-ring :focus,
+  .no-focus-ring :focus-visible {
+    outline: none;
+  }
+
   .shimmer {
     background: linear-gradient(
       90deg,

@@ -1,7 +1,7 @@
 'use client'
 
 import { Header } from '@/components/layout/header'
-import { INDUSTRY_LABELS, PRODUCT_TYPE_LABELS, Video } from '@/types/video'
+import { Video } from '@/types/video'
 import { VideoCard } from '@/components/video/video-card'
 import { VideoBackdrop } from '@/components/video/video-backdrop'
 import { useExpandedVideo } from '@/components/video/use-expanded-video'
@@ -21,7 +21,6 @@ export function CompanyView({ videos: companyVideos, initialVideoSlug }: Company
 
   const firstVideo = companyVideos[0]
   const companyName = firstVideo.company
-  const topIndustry = firstVideo.industry
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,16 +71,8 @@ export function CompanyView({ videos: companyVideos, initialVideoSlug }: Company
           {/* Meta */}
           <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-2 text-sm">
             <div className="space-y-1.5">
-              <span className="text-muted-dark font-mono text-[12px] uppercase tracking-wide block">Platform</span>
-              <p className="text-foreground">{PRODUCT_TYPE_LABELS[firstVideo.productType]}</p>
-            </div>
-            <div className="space-y-1.5">
               <span className="text-muted-dark font-mono text-[12px] uppercase tracking-wide block">Videos</span>
               <p className="text-foreground">{companyVideos.length}</p>
-            </div>
-            <div className="space-y-1.5">
-              <span className="text-muted-dark font-mono text-[12px] uppercase tracking-wide block">Category</span>
-              <p className="text-foreground">{INDUSTRY_LABELS[topIndustry]}</p>
             </div>
             {firstVideo.companyFounded && (
               <div className="space-y-1.5">

@@ -7,7 +7,8 @@ import { HomePageWrapper } from '@/components/home-page-wrapper'
 import { videos } from '@/data/videos'
 
 export default async function HomePage() {
-  const allVideos = videos
+  // Newest first by publish date (ISO YYYY-MM-DD sorts lexicographically).
+  const allVideos = [...videos].sort((a, b) => b.publishedDate.localeCompare(a.publishedDate))
 
   return (
     <HomePageWrapper>

@@ -2,13 +2,13 @@
 
 import { memo, useCallback, useEffect, useRef, useState, type CSSProperties, type TouchEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Video } from '@/types/video'
+import { Chapter, Video } from '@/types/video'
 import { formatDuration } from '@/lib/utils'
 import { CompanyLink } from '@/components/ui/company-link'
 import { PlayIcon, PauseIcon } from '@/components/ui/player-icons'
 import { VideoPlayer, VideoPlayerHandle, QualityLevel } from './modal/video-player'
 import { PlayerControls } from './modal/player-controls'
-import { getChaptersForVideo } from '@/data/chapters'
+import { useIntroContext } from '@/context/intro-context'
 
 const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const
 const SWIPE_CLOSE_THRESHOLD = 56
@@ -23,6 +23,10 @@ interface VideoCardProps {
   isExpanded?: boolean
   instant?: boolean
   disablePlayback?: boolean
+  /** Mount + pre-upscale this card even off-screen (e.g. arrow-nav neighbours). */
+  preload?: boolean
+  /** Another card is focused — pause this player's loading to free bandwidth. */
+  backgrounded?: boolean
 }
 
 export const VideoCard = memo(function VideoCard({
@@ -32,18 +36,26 @@ export const VideoCard = memo(function VideoCard({
   isExpanded = false,
   instant = false,
   disablePlayback = false,
+  preload = false,
+  backgrounded = false,
 }: VideoCardProps) {
   const playerRef = useRef<VideoPlayerHandle>(null)
   const boxRef = useRef<HTMLDivElement>(null)
+  const slotRef = useRef<HTMLDivElement>(null)
   const videoElRef = useRef<HTMLVideoElement | null>(null)
   const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const wheelDeltaRef = useRef(0)
 
   const isGhost = !video.videoUrl
   const isInteractive = !isGhost && !disablePlayback
-  const chapters = getChaptersForVideo(video.id)
+  // Segments hidden for now — pass no chapters so the seek bar renders as a
+  // single continuous track. Restore with getChaptersForVideo(video.id) later.
+  const chapters: Chapter[] = []
+  const { shouldShowIntro, introComplete, registerMedia, markMediaLoaded } = useIntroContext()
 
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null)
+  const [inView, setInView] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const [hasRenderedFrame, setHasRenderedFrame] = useState(false)
   const [isPlaying, setIsPlaying] = useState(true)
   const [showPlayIcon, setShowPlayIcon] = useState(false)
@@ -64,26 +76,68 @@ export const VideoCard = memo(function VideoCard({
   }
   const elevated = isExpanded || isCollapsing
 
+  // Only mount the HLS player once the card nears the viewport — keeps the
+  // initial grid from spinning up every player at once and starving the
+  // on-screen ones of bandwidth. Expanded or preloaded cards (arrow-nav
+  // neighbours) always mount, even off-screen. Once started, stay mounted to
+  // avoid reload churn while scrolling.
+  const shouldMountPlayer = isInteractive && (inView || isExpanded || preload)
+
+  // Pre-fetch the sharp rendition on hover, while expanded, or when queued as
+  // an arrow-nav neighbour — so it's already high-quality by the time it fills
+  // the screen instead of visibly ramping up afterwards.
+  const wantsHighRes = isInteractive && (isHovered || isExpanded || preload)
+  useEffect(() => {
+    playerRef.current?.setUpscale(wantsHighRes)
+  }, [wantsHighRes, videoEl])
+
+  useEffect(() => {
+    if (!isInteractive || inView) return
+    const el = slotRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setInView(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '200px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isInteractive, inView])
+
   // Grab the underlying <video> element once VideoPlayer has mounted.
   useEffect(() => {
-    if (!isInteractive) return
+    if (!shouldMountPlayer) return
     const el = playerRef.current?.getVideoElement() ?? null
     videoElRef.current = el
     setVideoEl(el)
-  }, [isInteractive, video.id])
+  }, [shouldMountPlayer, video.id])
+
+  // Register on-screen previews with the intro so it can hold the reveal until
+  // they've painted. Only matters during a first-visit intro.
+  useEffect(() => {
+    if (!shouldMountPlayer || !shouldShowIntro || introComplete) return
+    registerMedia(video.id)
+  }, [shouldMountPlayer, shouldShowIntro, introComplete, video.id, registerMedia])
 
   // Fade the thumbnail image once the video paints its first frame.
   useEffect(() => {
     if (!videoEl) return
-    if (videoEl.readyState >= 2) setHasRenderedFrame(true)
-    const mark = () => setHasRenderedFrame(true)
+    const mark = () => {
+      setHasRenderedFrame(true)
+      markMediaLoaded(video.id)
+    }
+    if (videoEl.readyState >= 2) mark()
     videoEl.addEventListener('loadeddata', mark)
     videoEl.addEventListener('playing', mark)
     return () => {
       videoEl.removeEventListener('loadeddata', mark)
       videoEl.removeEventListener('playing', mark)
     }
-  }, [videoEl])
+  }, [videoEl, video.id, markMediaLoaded])
 
   // Mirror play/pause state for the expanded controls overlay.
   useEffect(() => {
@@ -98,6 +152,18 @@ export const VideoCard = memo(function VideoCard({
       videoEl.removeEventListener('pause', handlePause)
     }
   }, [videoEl])
+
+  // Opening via keyboard navigation swaps to a card that was looping off-screen
+  // in the grid, so it "appears from nowhere" mid-playback. Restart it from the
+  // top in that case. A direct click keeps its position so the morph from the
+  // visible grid frame stays seamless.
+  useEffect(() => {
+    if (!isExpanded || !instant) return
+    const el = videoElRef.current
+    if (!el) return
+    el.currentTime = 0
+    el.play().catch(() => {})
+  }, [isExpanded, instant])
 
   // Handle Escape while expanded.
   useEffect(() => {
@@ -139,6 +205,24 @@ export const VideoCard = memo(function VideoCard({
     setShowPlayIcon(true)
     window.setTimeout(() => setShowPlayIcon(false), 500)
   }, [videoEl])
+
+  // Spacebar toggles play/pause while expanded. Arrow navigation (see
+  // use-expanded-video) already listens on `window`, but space previously only
+  // worked after a click had focused the overlay button — natively activating
+  // it. Handle it globally so it works the moment a video opens. Skip when an
+  // interactive element is focused so we don't double-fire or hijack its space.
+  useEffect(() => {
+    if (!isExpanded) return
+    const handleSpace = (event: KeyboardEvent) => {
+      if (event.key !== ' ' && event.code !== 'Space') return
+      const target = event.target as HTMLElement | null
+      if (target?.closest('button, a, input, select, textarea')) return
+      event.preventDefault()
+      togglePlay()
+    }
+    window.addEventListener('keydown', handleSpace)
+    return () => window.removeEventListener('keydown', handleSpace)
+  }, [isExpanded, togglePlay])
 
   const handleQualityChange = useCallback((index: number) => {
     playerRef.current?.setQuality(index)
@@ -245,10 +329,12 @@ export const VideoCard = memo(function VideoCard({
       tabIndex={isInteractive ? 0 : undefined}
       onClick={handleSelect}
       onKeyDown={handleKeyDown}
+      onPointerEnter={() => isInteractive && setIsHovered(true)}
+      onPointerLeave={() => setIsHovered(false)}
       className={`group ${isInteractive ? 'cursor-pointer' : ''} ${elevated ? 'relative z-[130]' : ''} ${isExpanded ? 'pointer-events-none' : ''}`}
     >
       {/* Reserved grid slot — keeps layout stable while the box expands */}
-      <div className="relative aspect-video w-full">
+      <div ref={slotRef} className="relative aspect-video w-full">
         <motion.div
           ref={boxRef}
           layout
@@ -282,13 +368,17 @@ export const VideoCard = memo(function VideoCard({
                   hasRenderedFrame ? 'opacity-0' : 'opacity-100'
                 }`}
               />
-              <VideoPlayer
-                ref={playerRef}
-                src={video.videoUrl}
-                startMuted={!isExpanded}
-                onQualityLevelsChange={setQualityLevels}
-                className="absolute inset-0 z-10 !rounded-none"
-              />
+              {shouldMountPlayer && (
+                <VideoPlayer
+                  ref={playerRef}
+                  src={video.videoUrl}
+                  startMuted={!isExpanded}
+                  expanded={isExpanded}
+                  backgrounded={backgrounded}
+                  onQualityLevelsChange={setQualityLevels}
+                  className="absolute inset-0 z-10 !rounded-none"
+                />
+              )}
             </>
           )}
 
@@ -322,6 +412,17 @@ export const VideoCard = memo(function VideoCard({
                   <h2 className="w-fit max-w-[85%] mt-1 text-sm sm:text-base font-light text-white tracking-tight rounded px-2 py-1 bg-black/45 backdrop-blur-sm">{video.title}</h2>
                 </div>
                 <div className="flex items-center gap-2 pointer-events-auto">
+                  {video.sourceUrl && (
+                    <a
+                      href={video.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                      className="h-7 px-3 text-xs rounded-full bg-black/45 text-white border border-white/20 hover:bg-black/55 inline-flex items-center justify-center font-medium transition-colors"
+                    >
+                      Post
+                    </a>
+                  )}
                   {video.websiteUrl && (
                     <a
                       href={video.websiteUrl}
@@ -381,8 +482,8 @@ export const VideoCard = memo(function VideoCard({
         </motion.div>
       </div>
 
-      {/* Info below card */}
-      <div className="flex items-center justify-between gap-2 pt-[14px] pb-1.5">
+      {/* Info below card — hidden while expanded so it doesn't float above the backdrop */}
+      <div className={`flex items-center justify-between gap-2 pt-[14px] pb-1.5 ${isExpanded ? 'invisible' : ''}`}>
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <CompanyLink
             company={video.company}

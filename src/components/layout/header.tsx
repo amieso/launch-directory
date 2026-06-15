@@ -31,20 +31,28 @@ export function Header() {
       <div className="absolute inset-0 bg-gradient-to-b from-background/70 to-transparent" />
       <div className="relative px-4 md:px-6">
         <div className="flex h-16 items-center justify-center pt-6 sm:pt-9">
-          {/* Logo - animates from center to header during settling phase */}
+          {/* Logo - animates from center to header during settling phase.
+              Phase-driven (not mount-driven) so it flies in at the reveal even
+              though the header now mounts at the very start of the intro. */}
           <Link href="/" className="flex items-center">
             <motion.div
-              initial={isSettling ? {
+              initial={shouldShowIntro ? {
                 opacity: 0,
                 scale: 160 / 44,
                 y: getStartY()
               } : {
-                opacity: showLogo ? 1 : 0
-              }}
-              animate={{
-                opacity: showLogo ? 1 : 0,
+                opacity: 1,
                 scale: 1,
                 y: 0,
+              }}
+              animate={showLogo ? {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+              } : {
+                opacity: 0,
+                scale: 160 / 44,
+                y: getStartY(),
               }}
               transition={isSettling ? {
                 scale: { duration: 0.7, ease: [0.23, 1, 0.32, 1] },
@@ -57,6 +65,21 @@ export function Header() {
               <AnimatedLogo isHovered={introComplete} />
             </motion.div>
           </Link>
+
+          {/* Partner button - top right */}
+          <motion.div
+            className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 mt-3 sm:mt-[18px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: showLogo ? 1 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Link
+              href="/partner"
+              className="inline-flex h-9 items-center rounded-full bg-foreground/5 px-4 text-sm text-foreground hover:bg-foreground/10 transition-colors"
+            >
+              Partner with us
+            </Link>
+          </motion.div>
         </div>
       </div>
     </header>

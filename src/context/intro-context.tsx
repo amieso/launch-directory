@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useCallback, useContext, useRef, useState, ReactNode } from 'react'
 
 type IntroPhase = 'tracing' | 'holding' | 'settling' | 'done'
 
@@ -13,6 +13,12 @@ interface IntroContextType {
   setContentReady: (value: boolean) => void
   introPhase: IntroPhase
   setIntroPhase: (phase: IntroPhase) => void
+  /** True once every registered above-the-fold preview has painted a frame. */
+  mediaReady: boolean
+  /** A preview declares it's loading and should gate the intro reveal. */
+  registerMedia: (id: string) => void
+  /** A preview reports it has painted its first frame. */
+  markMediaLoaded: (id: string) => void
 }
 
 const IntroContext = createContext<IntroContextType | null>(null)
@@ -22,6 +28,30 @@ export function IntroProvider({ children }: { children: ReactNode }) {
   const [shouldShowIntro, setShouldShowIntro] = useState(false)
   const [contentReady, setContentReady] = useState(false)
   const [introPhase, setIntroPhase] = useState<IntroPhase>('tracing')
+
+  const pendingMediaRef = useRef<Set<string>>(new Set())
+  const loadedMediaRef = useRef<Set<string>>(new Set())
+  const [mediaReady, setMediaReady] = useState(false)
+
+  const recomputeMediaReady = useCallback(() => {
+    const pending = pendingMediaRef.current
+    const loaded = loadedMediaRef.current
+    // Nothing above the fold to wait for counts as ready — but the moment a real
+    // preview registers (before the blink ends) this flips false until it paints.
+    setMediaReady([...pending].every((id) => loaded.has(id)))
+  }, [])
+
+  const registerMedia = useCallback((id: string) => {
+    if (pendingMediaRef.current.has(id)) return
+    pendingMediaRef.current.add(id)
+    recomputeMediaReady()
+  }, [recomputeMediaReady])
+
+  const markMediaLoaded = useCallback((id: string) => {
+    if (loadedMediaRef.current.has(id)) return
+    loadedMediaRef.current.add(id)
+    recomputeMediaReady()
+  }, [recomputeMediaReady])
 
   return (
     <IntroContext.Provider
@@ -34,6 +64,9 @@ export function IntroProvider({ children }: { children: ReactNode }) {
         setContentReady,
         introPhase,
         setIntroPhase,
+        mediaReady,
+        registerMedia,
+        markMediaLoaded,
       }}
     >
       {children}
@@ -54,6 +87,9 @@ export function useIntroContext() {
       setContentReady: () => {},
       introPhase: 'done' as IntroPhase,
       setIntroPhase: () => {},
+      mediaReady: true,
+      registerMedia: () => {},
+      markMediaLoaded: () => {},
     }
   }
   return context

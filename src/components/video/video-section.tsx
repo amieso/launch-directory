@@ -10,7 +10,7 @@ interface VideoSectionProps {
 export function VideoSection({ videos }: VideoSectionProps) {
   return (
     <div className="px-4 md:px-6 mt-8 md:mt-10">
-      <VideoGrid videos={videos} columns={4} />
+      <VideoGrid videos={videos} columns={4} partnerCardAt={4} />
     </div>
   )
 }

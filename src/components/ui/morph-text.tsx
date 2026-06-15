@@ -9,6 +9,7 @@ interface MorphTextProps {
   interval?: number
   className?: string
   staggerDelay?: number
+  animate?: boolean
 }
 
 const charVariants = {
@@ -41,7 +42,7 @@ function AnimatedWord({ text, staggerDelay = 0.015 }: { text: string; staggerDel
   )
 }
 
-export function MorphText({ words, prefix, interval = 3000, className = '', staggerDelay = 0.015 }: MorphTextProps) {
+export function MorphText({ words, prefix, interval = 3000, className = '', staggerDelay = 0.015, animate = true }: MorphTextProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [width, setWidth] = useState<number | 'auto'>('auto')
   const containerRef = useRef<HTMLSpanElement>(null)
@@ -52,9 +53,19 @@ export function MorphText({ words, prefix, interval = 3000, className = '', stag
   }, [words.length])
 
   useEffect(() => {
+    if (!animate) return
     const timer = setInterval(nextWord, interval)
     return () => clearInterval(timer)
-  }, [nextWord, interval])
+  }, [animate, nextWord, interval])
+
+  if (!animate) {
+    return (
+      <span className={`inline-block ${className}`}>
+        {prefix && <span>{prefix}&nbsp;</span>}
+        <span>{words[0]}</span>
+      </span>
+    )
+  }
 
   // Measure width using a hidden element that always shows current word
   useLayoutEffect(() => {

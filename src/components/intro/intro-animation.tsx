@@ -12,11 +12,17 @@ interface IntroAnimationProps {
   onContentReady?: () => void
 }
 
+// How long after the blink we'll wait for the visible previews to paint before
+// revealing anyway — a slow network must never trap the visitor on the intro.
+const MEDIA_WAIT_CAP_MS = 2000
+
 export function IntroAnimation({ onComplete, onContentReady }: IntroAnimationProps) {
   const [phase, setPhase] = useState<Phase>('tracing')
   const [shouldBlink, setShouldBlink] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
-  const { setIntroPhase } = useIntroContext()
+  const [blinkDone, setBlinkDone] = useState(false)
+  const settledRef = useRef(false)
+  const { setIntroPhase, mediaReady } = useIntroContext()
 
   // Store callbacks in refs to avoid stale closure and dependency issues
   const onCompleteRef = useRef(onComplete)
@@ -24,36 +30,42 @@ export function IntroAnimation({ onComplete, onContentReady }: IntroAnimationPro
   const onContentReadyRef = useRef(onContentReady)
   onContentReadyRef.current = onContentReady
 
+  // Logo trace → blink. Content mounts behind the overlay from the start, so the
+  // visible previews are already loading while this plays.
   useEffect(() => {
-    // Phase timing
     const timers: NodeJS.Timeout[] = []
+    timers.push(setTimeout(() => setShouldBlink(true), 2000))
+    timers.push(setTimeout(() => setBlinkDone(true), 2300))
+    return () => timers.forEach(clearTimeout)
+  }, [])
 
-    // After trace completes (2s), trigger blink
-    timers.push(setTimeout(() => {
-      setShouldBlink(true)
-    }, 2000))
+  // Once the blink is done, reveal as soon as the visible previews have painted
+  // — or after the cap, whichever comes first. Settling cross-fades the logo
+  // into the header and fades the overlay out.
+  useEffect(() => {
+    if (!blinkDone || settledRef.current) return
 
-    // After blink completes (2s + 0.3s = 2.3s), start settling
-    timers.push(setTimeout(() => {
+    const settle = () => {
+      if (settledRef.current) return
+      settledRef.current = true
       setPhase('settling')
       setIntroPhase('settling')
       onContentReadyRef.current?.()
-    }, 2300))
+      setTimeout(() => setIsVisible(false), 200)
+      setTimeout(() => {
+        setPhase('done')
+        setIntroPhase('done')
+        onCompleteRef.current?.()
+      }, 700)
+    }
 
-    // At 2.5s, hide overlay
-    timers.push(setTimeout(() => {
-      setIsVisible(false)
-    }, 2500))
-
-    // After settle complete (3s), mark done
-    timers.push(setTimeout(() => {
-      setPhase('done')
-      setIntroPhase('done')
-      onCompleteRef.current?.()
-    }, 3000))
-
-    return () => timers.forEach(clearTimeout)
-  }, [setIntroPhase])
+    if (mediaReady) {
+      settle()
+      return
+    }
+    const cap = setTimeout(settle, MEDIA_WAIT_CAP_MS)
+    return () => clearTimeout(cap)
+  }, [blinkDone, mediaReady, setIntroPhase])
 
   const isSettling = phase === 'settling' || phase === 'done'
 

@@ -2,10 +2,7 @@
 
 import { useState } from 'react'
 import { ArrowIcon } from './ui/player-icons'
-import { MorphText } from './ui/morph-text'
 import { EmojiConfetti } from './ui/emoji-confetti'
-
-const ROTATING_WORDS = ['launch video', 'product demo', 'announcement']
 
 export function HeroSection() {
   const [email, setEmail] = useState('')
@@ -48,11 +45,10 @@ export function HeroSection() {
   return (
     <section className="px-4 md:px-6 pt-[50px] pb-12 md:pt-[116px] md:pb-32">
       <div className="max-w-3xl mx-auto text-center">
-        <p className="text-sm font-mono text-muted uppercase tracking-widest mb-5 md:mb-7">
-          From the makers of Amie
-        </p>
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground leading-[1.1] tracking-tight">
-          <MorphText prefix="Find your next" words={ROTATING_WORDS} />
+          The rumors are true.
+          <br />
+          These are the best launch videos.
         </h1>
         <p className="mt-4 text-base md:text-lg text-muted leading-relaxed max-w-xl mx-auto">
           A curated collection of the best product launch videos. Subscribe to get the latest launches delivered to your inbox.
