@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Header } from '@/components/layout/header'
 import { ArrowIcon } from '@/components/ui/player-icons'
 import { unslugifyCompany } from '@/lib/utils'
+import { trackGoal, GOALS } from '@/lib/analytics'
 
 interface RequestCompanyProps {
   slug: string
@@ -35,6 +36,7 @@ export function RequestCompany({ slug }: RequestCompanyProps) {
       if (!res.ok) throw new Error()
       setStatus('success')
       setEmail('')
+      trackGoal(GOALS.newsletterSignup, { location: 'request_company', company: slug })
     } catch {
       setStatus('error')
       setErrorMessage('Email not supported')

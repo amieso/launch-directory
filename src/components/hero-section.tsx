@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ArrowIcon } from './ui/player-icons'
 import { EmojiConfetti } from './ui/emoji-confetti'
+import { trackGoal, GOALS } from '@/lib/analytics'
 
 export function HeroSection() {
   const [email, setEmail] = useState('')
@@ -31,6 +32,7 @@ export function HeroSection() {
 
       setStatus('success')
       setEmail('')
+      trackGoal(GOALS.newsletterSignup, { location: 'hero' })
 
       // Reset to idle after 4 seconds
       setTimeout(() => {

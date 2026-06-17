@@ -10,6 +10,7 @@ import { VideoPlayer, VideoPlayerHandle, QualityLevel } from './modal/video-play
 import { PlayerControls } from './modal/player-controls'
 import { VideoMetrics } from './video-metrics'
 import { useIntroContext } from '@/context/intro-context'
+import { trackGoal, GOALS } from '@/lib/analytics'
 
 const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const
 const SWIPE_CLOSE_THRESHOLD = 56
@@ -176,6 +177,54 @@ export const VideoCard = memo(function VideoCard({
       videoEl.removeEventListener('pause', handlePause)
     }
   }, [videoEl])
+
+  // Analytics: a real "watch" (video_play) and "watched to the end"
+  // (video_complete), scoped to the expanded player so grid-preview autoplay and
+  // looping don't pollute the data. Each fires once per expand session; reset
+  // when the card collapses so re-opening counts as a fresh watch.
+  const playTrackedRef = useRef(false)
+  const completeTrackedRef = useRef(false)
+  useEffect(() => {
+    if (!isExpanded) {
+      playTrackedRef.current = false
+      completeTrackedRef.current = false
+      return
+    }
+    if (!videoEl) return
+
+    const meta = {
+      video_id: video.id,
+      company: video.companySlug,
+      slug: video.slug,
+    }
+
+    const handlePlay = () => {
+      if (playTrackedRef.current) return
+      playTrackedRef.current = true
+      trackGoal(GOALS.videoPlay, meta)
+    }
+
+    // The player loops internally by seeking to 0 on `ended`, so `ended` is
+    // unreliable here — detect completion when playback crosses ~98% instead.
+    const handleTimeUpdate = () => {
+      if (completeTrackedRef.current) return
+      const { currentTime, duration } = videoEl
+      if (!Number.isFinite(duration) || duration <= 0) return
+      if (currentTime / duration >= 0.98) {
+        completeTrackedRef.current = true
+        trackGoal(GOALS.videoComplete, meta)
+      }
+    }
+
+    videoEl.addEventListener('play', handlePlay)
+    videoEl.addEventListener('timeupdate', handleTimeUpdate)
+    // Catch the case where it's already playing the moment we expand.
+    if (!videoEl.paused) handlePlay()
+    return () => {
+      videoEl.removeEventListener('play', handlePlay)
+      videoEl.removeEventListener('timeupdate', handleTimeUpdate)
+    }
+  }, [isExpanded, videoEl, video.id, video.companySlug, video.slug])
 
   // Opening via keyboard navigation swaps to a card that was looping off-screen
   // in the grid, so it "appears from nowhere" mid-playback. Restart it from the
@@ -441,7 +490,14 @@ export const VideoCard = memo(function VideoCard({
                       href={video.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={(event) => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        trackGoal(GOALS.outboundPost, {
+                          video_id: video.id,
+                          company: video.companySlug,
+                          slug: video.slug,
+                        })
+                      }}
                       className="h-7 px-3 text-xs rounded-full bg-black/45 text-white border border-white/20 hover:bg-black/55 inline-flex items-center justify-center font-medium transition-colors"
                     >
                       Post
@@ -452,7 +508,14 @@ export const VideoCard = memo(function VideoCard({
                       href={video.websiteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={(event) => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        trackGoal(GOALS.outboundVisit, {
+                          video_id: video.id,
+                          company: video.companySlug,
+                          slug: video.slug,
+                        })
+                      }}
                       className="h-7 px-3 text-xs rounded-full bg-black/45 text-white border border-white/20 hover:bg-black/55 inline-flex items-center justify-center font-medium transition-colors"
                     >
                       Visit

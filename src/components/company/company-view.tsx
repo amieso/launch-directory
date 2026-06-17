@@ -5,6 +5,8 @@ import { Video } from '@/types/video'
 import { VideoCard } from '@/components/video/video-card'
 import { VideoBackdrop } from '@/components/video/video-backdrop'
 import { useExpandedVideo } from '@/components/video/use-expanded-video'
+import { useEffect, useRef } from 'react'
+import { trackGoalWhenReady, GOALS } from '@/lib/analytics'
 
 interface CompanyViewProps {
   videos: Video[]
@@ -23,6 +25,20 @@ export function CompanyView({ videos: companyVideos, initialVideoSlug }: Company
   })
 
   const companyName = firstVideo.company
+
+  // Track company-page views. Skip when landing straight into a video deep link
+  // (that already fires video_open with source: 'direct_link'), so this goal
+  // cleanly counts profile-page visits. Fires once per mount.
+  const trackedPageRef = useRef(false)
+  useEffect(() => {
+    if (trackedPageRef.current) return
+    if (initialVideoSlug) return
+    trackedPageRef.current = true
+    trackGoalWhenReady(GOALS.companyPageView, {
+      company: firstVideo.companySlug,
+      video_count: String(companyVideos.length),
+    })
+  }, [initialVideoSlug, firstVideo.companySlug, companyVideos.length])
 
   return (
     <div className="min-h-screen bg-background">

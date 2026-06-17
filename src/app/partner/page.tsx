@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Header } from '@/components/layout/header'
 import { PARTNER_OPTIONS } from '@/data/partner'
+import { PartnerCtaLink } from '@/components/partner/partner-cta-link'
 
 export const metadata: Metadata = {
   title: 'Partner with Lowkey',
@@ -39,12 +40,13 @@ export default function PartnerPage() {
             >
               <h2 className="text-lg font-medium text-foreground mb-3">{option.name}</h2>
               <p className="text-sm text-muted leading-relaxed mb-6 flex-1">{option.description}</p>
-              <a
+              <PartnerCtaLink
                 href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${option.name} — Lowkey`)}`}
+                optionId={option.id}
                 className="inline-flex h-9 w-fit items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-opacity hover:opacity-80"
               >
                 Get in touch
-              </a>
+              </PartnerCtaLink>
             </section>
           ))}
         </div>
@@ -56,10 +58,11 @@ export default function PartnerPage() {
           </p>
           <div className="divide-y divide-border rounded-lg border border-border">
             {SECONDARY_OPTIONS.map((option) => (
-              <a
+              <PartnerCtaLink
                 key={option.id}
-                id={option.id}
                 href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${option.name} — Lowkey`)}`}
+                optionId={option.id}
+                id={option.id}
                 className="group flex items-center justify-between gap-4 scroll-mt-28 px-5 py-4 transition-colors hover:bg-surface"
               >
                 <div>
@@ -71,7 +74,7 @@ export default function PartnerPage() {
                 <span className="text-sm text-muted-dark group-hover:text-foreground transition-colors shrink-0">
                   Get in touch →
                 </span>
-              </a>
+              </PartnerCtaLink>
             ))}
           </div>
         </div>

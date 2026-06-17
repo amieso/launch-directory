@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Video } from '@/types/video'
 import { videoPath } from '@/data/videos'
-import { trackGoal, trackGoalWhenReady } from '@/lib/analytics'
+import { trackGoal, trackGoalWhenReady, GOALS } from '@/lib/analytics'
 
 interface UseExpandedVideoOptions {
   /** Video open on first render (deep-link landing on /[company]/[slug]). */
@@ -62,7 +62,7 @@ export function useExpandedVideo(
     (video: Video) => {
       setInstant(false)
       setExpandedVideoId(video.id)
-      trackGoal('video_open', {
+      trackGoal(GOALS.videoOpen, {
         video_id: video.id,
         company: video.companySlug,
         slug: video.slug,
@@ -86,7 +86,7 @@ export function useExpandedVideo(
     const video = videos.find((v) => v.id === initialId)
     if (!video) return
     trackedInitialRef.current = true
-    trackGoalWhenReady('video_open', {
+    trackGoalWhenReady(GOALS.videoOpen, {
       video_id: video.id,
       company: video.companySlug,
       slug: video.slug,
@@ -129,6 +129,12 @@ export function useExpandedVideo(
       setInstant(true)
       setExpandedVideoId(next.id)
       writeUrl(videoPath(next), 'replace')
+      trackGoal(GOALS.arrowNavigation, {
+        direction: event.key === 'ArrowRight' ? 'next' : 'prev',
+        video_id: next.id,
+        company: next.companySlug,
+        slug: next.slug,
+      })
     }
 
     window.addEventListener('keydown', handleArrows)

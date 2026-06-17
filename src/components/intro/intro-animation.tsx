@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IntroLogo } from './intro-logo'
 import { useIntroContext } from '@/context/intro-context'
+import { trackGoal, GOALS } from '@/lib/analytics'
 
 type Phase = 'tracing' | 'blinking' | 'settling' | 'done'
 
@@ -55,6 +56,9 @@ export function IntroAnimation({ onComplete, onContentReady }: IntroAnimationPro
       setTimeout(() => {
         setPhase('done')
         setIntroPhase('done')
+        trackGoal(GOALS.introCompleted, {
+          waited_for_media: mediaReady ? 'false' : 'true',
+        })
         onCompleteRef.current?.()
       }, 700)
     }

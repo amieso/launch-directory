@@ -15,8 +15,25 @@ declare global {
   }
 }
 
+// Central registry of goal names so call sites can't drift or typo. DataFast
+// auto-creates goals on first sighting, so the names here are the contract.
+export const GOALS = {
+  videoOpen: 'video_open',
+  videoPlay: 'video_play',
+  videoComplete: 'video_complete',
+  newsletterSignup: 'newsletter_signup',
+  outboundVisit: 'outbound_visit',
+  outboundPost: 'outbound_post',
+  companyPageView: 'company_page_view',
+  arrowNavigation: 'arrow_navigation',
+  introCompleted: 'intro_completed',
+  partnerCtaClick: 'partner_cta_click',
+} as const
+
+export type GoalName = (typeof GOALS)[keyof typeof GOALS]
+
 /** Fire a DataFast goal. No-ops when the client isn't available. */
-export function trackGoal(goal: string, metadata?: Record<string, string>): void {
+export function trackGoal(goal: GoalName, metadata?: Record<string, string>): void {
   if (typeof window === 'undefined') return
   try {
     window.datafast?.(goal, metadata)
@@ -32,7 +49,7 @@ export function trackGoal(goal: string, metadata?: Record<string, string>): void
  * is present, then gives up so a blocked/absent client never spins forever.
  */
 export function trackGoalWhenReady(
-  goal: string,
+  goal: GoalName,
   metadata?: Record<string, string>,
   { retries = 20, intervalMs = 250 }: { retries?: number; intervalMs?: number } = {},
 ): void {
