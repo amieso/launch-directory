@@ -758,6 +758,26 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2025-04-24',
   },
+  {
+    id: '37',
+    slug: 'launch',
+    companySlug: 'supershrimp',
+    title: 'SuperShrimp',
+    company: 'SuperShrimp',
+    companyLogoUrl: 'https://img.logo.dev/supershrimp.io?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    description: 'Marc Lou\'s SuperShrimp uses your MacBook camera and on-device AI to catch you slouching—when you sit like a shrimp, it pops a live preview so you fix your posture. Fully local, works offline, with an XP system that evolves your shrimp.',
+    videoUrl: 'https://stream.mux.com/Fy2toCuf8Rbc6kMcYrdEIIc2LLad2l02LM2UvFjF3j6o.m3u8',
+    thumbnailUrl: 'https://image.mux.com/Fy2toCuf8Rbc6kMcYrdEIIc2LLad2l02LM2UvFjF3j6o/thumbnail.webp?time=5',
+    duration: 145,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://supershrimp.io',
+    sourceUrl: 'https://x.com/marclou/status/2039696115818225909',
+    credits: [
+      { role: 'Creator', name: 'Marc Lou', handle: 'marclou', url: 'https://supershrimp.io', bio: 'Indie hacker behind ShipFast and dozens of small products. SuperShrimp is one of his many bootstrapped apps, built solo.', contactUrl: 'https://x.com/marclou', imageUrl: 'https://unavatar.io/x/marclou', twitterHandle: 'marclou' }
+    ],
+    featured: false,
+    publishedDate: '2026-04-02',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
