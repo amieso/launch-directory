@@ -123,6 +123,21 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
         applyInitialTime()
       }
 
+      // The native `loop` attribute is ignored when HLS.js feeds playback
+      // through Media Source Extensions (Chrome/Firefox/Edge) — the element
+      // fires `ended` and stops instead of restarting. Loop manually so grid
+      // previews keep cycling. (Safari's native HLS path honours `loop`, but
+      // this handler is harmless there.)
+      const handleEnded = () => {
+        try {
+          videoEl.currentTime = 0
+          videoEl.play().catch(() => {})
+        } catch {
+          // currentTime can throw if the media detached mid-teardown — ignore.
+        }
+      }
+      videoEl.addEventListener('ended', handleEnded)
+
       videoEl.addEventListener('loadedmetadata', handleLoadedMetadata)
 
       if (Hls.isSupported()) {
@@ -163,6 +178,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
 
         return () => {
           videoEl.removeEventListener('loadedmetadata', handleLoadedMetadata)
+          videoEl.removeEventListener('ended', handleEnded)
           hls.destroy()
           hlsRef.current = null
           setQualityLevels([])
@@ -175,11 +191,13 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
 
         return () => {
           videoEl.removeEventListener('loadedmetadata', handleLoadedMetadata)
+          videoEl.removeEventListener('ended', handleEnded)
         }
       }
 
       return () => {
         videoEl.removeEventListener('loadedmetadata', handleLoadedMetadata)
+        videoEl.removeEventListener('ended', handleEnded)
       }
     }, [src, initialTime, onQualityLevelsChange, applyUpscale])
 
