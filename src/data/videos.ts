@@ -169,21 +169,24 @@ export const videos: Video[] = [
   {
     id: '9',
     slug: 'series-b',
-    companySlug: 'human-interface',
-    title: 'Human Interface Series B',
-    company: 'Human Interface',
-    companyLogoUrl: 'https://img.logo.dev/humaninterface.ai?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companySlug: 'tavus',
+    title: 'Tavus Series B — Meet the PALs',
+    company: 'Tavus',
+    companyLogoUrl: 'https://img.logo.dev/tavus.io?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
     companyFounded: 2021,
-    description: 'Human Interface just closed their Series B to continue building what they believe is the future of how we interact with computers. Their vision goes beyond touchscreens and voice—toward interfaces that feel intuitive and almost invisible.',
+    description: 'Tavus raised a $40M Series B from CRV, Scale, Sequoia, and Y Combinator to teach machines the art of being human—so using a computer feels like talking to a friend. The film also introduces the PALs, a new kind of conversational AI.',
     videoUrl: 'https://stream.mux.com/M4IAFnP02oAvXE5b01KHZzY00hDJjjLa4zqwmGh8Ry016JE.m3u8',
     thumbnailUrl: 'https://image.mux.com/M4IAFnP02oAvXE5b01KHZzY00hDJjjLa4zqwmGh8Ry016JE/thumbnail.webp?time=5',
     duration: 211,
     aspectRatio: '16:9',
+    websiteUrl: 'https://tavus.io',
+    twitterUrl: 'https://twitter.com/heytavus',
+    sourceUrl: 'https://x.com/hassaanraza/status/1988666194795331996',
     credits: [
-      { role: 'Creator', name: 'Hassaan Raza', handle: 'hassaanraza', url: 'https://hassaanraza.com', bio: 'CEO of Tavus, the AI video personalization platform. Teaching machines the art of being human through hyper-realistic digital replicas.', contactUrl: 'https://twitter.com/hassaanrza', imageUrl: 'https://unavatar.io/twitter/hassaanrza', twitterHandle: 'hassaanrza' }
+      { role: 'Founder', name: 'Hassaan Raza', handle: 'hassaanraza', url: 'https://tavus.io', bio: 'Co-founder & CEO of Tavus, the human computing company. Building conversational video AI and digital replicas that make computers feel human.', contactUrl: 'https://x.com/hassaanraza', imageUrl: 'https://unavatar.io/x/hassaanraza', twitterHandle: 'hassaanraza' }
     ],
     featured: false,
-    publishedDate: '2024-11-10',
+    publishedDate: '2025-11-12',
   },
   {
     id: '10',
