@@ -228,22 +228,23 @@ export const videos: Video[] = [
     id: '12',
     slug: 'launch',
     companySlug: 'amie',
-    title: 'Amie Launch',
+    title: 'Amie 2.0',
     company: 'Amie',
     companyLogoUrl: 'https://img.logo.dev/amie.so?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
     companyFounded: 2020,
-    description: 'Amie brings joy back to productivity. A calendar and task manager that makes managing your day feel delightful through thoughtful design and seamless interactions.',
+    description: 'Amie 2.0—the joyful app that fuses calendar, to-dos, and email into one. After a year of almost starting over, founder Dennis Müller relaunches the productivity tool he has spent years crafting, proud of it again.',
     videoUrl: 'https://stream.mux.com/Mzhq00ln0100XwK2irqOToKHwhod1ad1T1B7yxFJpgrfV4.m3u8',
     thumbnailUrl: 'https://image.mux.com/Mzhq00ln0100XwK2irqOToKHwhod1ad1T1B7yxFJpgrfV4/thumbnail.webp?time=5',
     duration: 54,
     aspectRatio: '16:9',
     websiteUrl: 'https://amie.so',
-    twitterUrl: 'https://twitter.com/amaborhq',
+    twitterUrl: 'https://twitter.com/tryamie',
+    sourceUrl: 'https://x.com/dennismuellr/status/1909641514533446109',
     credits: [
-      { role: 'Creator', name: 'Dennis Müller', handle: 'dennismueller', url: 'https://amie.so', bio: 'Founder & CEO of Amie, the joyful productivity app. Former N26 product manager with a deep obsession for beautiful, functional design.', contactUrl: 'https://twitter.com/dennismueller', imageUrl: 'https://unavatar.io/x/dennismuellr', twitterHandle: 'dennismuellr', instagramHandle: 'dennismuellr' }
+      { role: 'Founder', name: 'Dennis Müller', handle: 'dennismuellr', url: 'https://amie.so', bio: 'Founder & CEO of Amie, the joyful productivity app that fuses calendar, to-dos, and email into one.', contactUrl: 'https://x.com/dennismuellr', imageUrl: 'https://unavatar.io/x/dennismuellr', twitterHandle: 'dennismuellr' }
     ],
     featured: false,
-    publishedDate: '2024-09-20',
+    publishedDate: '2025-04-08',
   },
   {
     id: '13',
