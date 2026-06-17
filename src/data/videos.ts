@@ -842,6 +842,28 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2026-06-09',
   },
+  {
+    id: '41',
+    slug: 'your-calendar-is-your-personal-philosophy',
+    companySlug: 'amie',
+    title: 'Your calendar is your personal philosophy',
+    company: 'Amie',
+    companyLogoUrl: 'https://img.logo.dev/amie.so?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2020,
+    description: 'Amie shares its vision: your calendar is your personal philosophy. A look at how the joyful productivity app thinks about time today—and where it is headed tomorrow.',
+    videoUrl: '', // ingest:pending uploadId=none-41
+    thumbnailUrl: '', // ingest:pending uploadId=none-41
+    duration: 176,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://amie.so',
+    twitterUrl: 'https://x.com/tryamie',
+    sourceUrl: 'https://x.com/tryamie/status/1750224209324708049',
+    credits: [
+      { role: 'Founder', name: 'Dennis Müller', handle: 'dennismuellr', url: 'https://amie.so', bio: 'Founder & CEO of Amie, the joyful productivity app that fuses calendar, to-dos, and email into one.', contactUrl: 'https://x.com/dennismuellr', imageUrl: 'https://unavatar.io/x/dennismuellr', twitterHandle: 'dennismuellr' }
+    ],
+    featured: false,
+    publishedDate: '2024-01-24',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
