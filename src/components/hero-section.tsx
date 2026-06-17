@@ -62,7 +62,7 @@ export function HeroSection() {
               <EmojiConfetti trigger={status === 'success'} />
               <div
               className={`relative h-10 rounded-full overflow-hidden bg-foreground/5 transition-all duration-300 ${
-                status === 'success' ? 'w-[156px]' : 'w-full md:w-[288px]'
+                status === 'success' ? 'w-[156px]' : 'w-full md:w-[346px]'
               }`}
             >
               <input
