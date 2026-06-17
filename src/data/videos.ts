@@ -851,8 +851,8 @@ export const videos: Video[] = [
     companyLogoUrl: 'https://img.logo.dev/amie.so?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
     companyFounded: 2020,
     description: 'Amie shares its vision: your calendar is your personal philosophy. A look at how the joyful productivity app thinks about time today—and where it is headed tomorrow.',
-    videoUrl: '', // ingest:pending uploadId=none-41
-    thumbnailUrl: '', // ingest:pending uploadId=none-41
+    videoUrl: 'https://stream.mux.com/17CAEeOjljKU48s8dJsbPso8cCSsrlgqfyRwkaISbHM.m3u8',
+    thumbnailUrl: 'https://image.mux.com/17CAEeOjljKU48s8dJsbPso8cCSsrlgqfyRwkaISbHM/thumbnail.webp?time=5',
     duration: 176,
     aspectRatio: '16:9',
     websiteUrl: 'https://amie.so',
