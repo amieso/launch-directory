@@ -73,12 +73,22 @@ export function Header() {
             animate={{ opacity: showLogo ? 1 : 0 }}
             transition={{ duration: 0.2 }}
           >
-            <Link
-              href="/partner"
-              className="inline-flex h-9 items-center rounded-full bg-foreground/5 px-4 text-sm text-foreground hover:bg-foreground/10 transition-colors"
-            >
-              Partner with us
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="https://x.com/viewlowkey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-9 items-center rounded-full px-4 text-sm text-muted hover:text-foreground transition-colors"
+              >
+                Follow on X
+              </Link>
+              <Link
+                href="/partner"
+                className="inline-flex h-9 items-center rounded-full bg-foreground/5 px-4 text-sm text-foreground hover:bg-foreground/10 transition-colors"
+              >
+                Partner with us
+              </Link>
+            </div>
           </motion.div>
         </div>
       </div>
