@@ -26,20 +26,21 @@ export const videos: Video[] = [
     id: '2',
     slug: 'announcement',
     companySlug: 'lightfield',
-    title: 'Lightfield Announcement',
+    title: 'Lightfield Launch',
     company: 'Lightfield',
-    companyLogoUrl: 'https://img.logo.dev/lightfieldlab.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
-    companyFounded: 2017,
-    description: 'Lightfield is pioneering the next evolution of display technology. Their holographic screens bring depth and dimension to everyday devices, making 3D visuals accessible without the need for special glasses or headsets.',
+    companyLogoUrl: 'https://img.logo.dev/lightfield.app?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    description: 'Lightfield is an AI-native CRM built for founders going zero to one—shaped over the past year by hundreds of founders who use it daily, with 20,000 more on the waitlist. It turns countless customer conversations into an organized system that moves deals forward.',
     videoUrl: 'https://stream.mux.com/F7Ng6VMdDNAk5xD7nXOGpsfPIufSudV8XKvI6CpQmlE.m3u8',
     thumbnailUrl: 'https://image.mux.com/F7Ng6VMdDNAk5xD7nXOGpsfPIufSudV8XKvI6CpQmlE/thumbnail.webp?time=5',
     duration: 187,
     aspectRatio: '16:9',
+    websiteUrl: 'https://lightfield.app',
+    sourceUrl: 'https://x.com/hliriani/status/1989015370615910878',
     credits: [
-      { role: 'In-house', name: 'Lightfield Creative', handle: 'lightfieldcreative', bio: 'Lightfield Labs internal brand and creative team. Pioneering holographic display technology and bringing glasses-free 3D to the mainstream.', imageUrl: 'https://img.logo.dev/lightfieldlab.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark', twitterHandle: 'LightfieldLab' }
+      { role: 'Founder', name: 'Henri Liriani', handle: 'hliriani', url: 'https://lightfield.app', bio: 'Co-founder & CEO of Lightfield, the AI-native CRM for founders going zero to one.', contactUrl: 'https://x.com/hliriani', imageUrl: 'https://unavatar.io/x/hliriani', twitterHandle: 'hliriani' }
     ],
     featured: true,
-    publishedDate: '2024-11-15',
+    publishedDate: '2025-11-13',
   },
   {
     id: '3',
