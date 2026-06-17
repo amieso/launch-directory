@@ -516,6 +516,27 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2026-05-11',
   },
+  {
+    id: '26',
+    slug: 'friends',
+    companySlug: 'born',
+    title: 'Introducing Friends',
+    company: 'Born',
+    companyLogoUrl: 'https://img.logo.dev/born.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2022,
+    description: 'Born evolves Pengu—its 15M-user social AI pet—into Friends, a platform of trustworthy, fun AI characters for the moments that matter, from connection to learning. The launch also previews Life, a photorealistic digital companion experience.',
+    videoUrl: 'https://stream.mux.com/LrDuiZEERNCB10113B02Ld8Ty9m7KsTTXLSxlGgc62ti8.m3u8',
+    thumbnailUrl: 'https://image.mux.com/LrDuiZEERNCB10113B02Ld8Ty9m7KsTTXLSxlGgc62ti8/thumbnail.webp?time=5',
+    duration: 99,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://born.com',
+    sourceUrl: 'https://x.com/fabiankamberi/status/2011164301437124892',
+    credits: [
+      { role: 'Founder', name: 'Fabian Kamberi', handle: 'fabiankamberi', url: 'https://born.com', bio: 'Co-founder & CEO of Born, the Berlin company behind Pengu and Friends. Building social AI companions designed to bring people together. Founded in 2022; raised $15M.', contactUrl: 'https://x.com/fabiankamberi', imageUrl: 'https://unavatar.io/x/fabiankamberi', twitterHandle: 'fabiankamberi' }
+    ],
+    featured: false,
+    publishedDate: '2026-01-13',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
