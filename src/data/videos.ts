@@ -778,6 +778,26 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2026-04-02',
   },
+  {
+    id: '38',
+    slug: 'cheats',
+    companySlug: 'spielwerk',
+    title: 'Introducing Cheats',
+    company: 'Spielwerk',
+    companyLogoUrl: 'https://img.logo.dev/spielwerk.app?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    description: 'Spielwerk introduces Cheats—a way to make things without knowing what to prompt. The pitch: prompting has failed most people because they do not know what to type, so Cheats hands you the shortcuts instead.',
+    videoUrl: 'https://stream.mux.com/hZWmHLPLBXqow01r8OWAF02EI6W2A8ADOSzSVk2magNSo.m3u8',
+    thumbnailUrl: 'https://image.mux.com/hZWmHLPLBXqow01r8OWAF02EI6W2A8ADOSzSVk2magNSo/thumbnail.webp?time=5',
+    duration: 39,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://spielwerk.app',
+    sourceUrl: 'https://x.com/eikedrescher/status/2033566191961137591',
+    credits: [
+      { role: 'Founder', name: 'Eike Drescher', handle: 'eikedrescher', url: 'https://spielwerk.app', bio: 'Founder of Spielwerk. Building tools that let anyone create, not just experts who know the right prompt.', contactUrl: 'https://x.com/eikedrescher', imageUrl: 'https://unavatar.io/x/eikedrescher', twitterHandle: 'eikedrescher' }
+    ],
+    featured: false,
+    publishedDate: '2026-03-16',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
