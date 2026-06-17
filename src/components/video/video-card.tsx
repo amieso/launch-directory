@@ -8,6 +8,7 @@ import { CompanyLink } from '@/components/ui/company-link'
 import { PlayIcon, PauseIcon } from '@/components/ui/player-icons'
 import { VideoPlayer, VideoPlayerHandle, QualityLevel } from './modal/video-player'
 import { PlayerControls } from './modal/player-controls'
+import { VideoMetrics } from './video-metrics'
 import { useIntroContext } from '@/context/intro-context'
 
 const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const
@@ -235,7 +236,11 @@ export const VideoCard = memo(function VideoCard({
   }, [isInteractive, isExpanded, onSelect, video])
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if ((event.key === 'Enter' || event.key === ' ') && isInteractive && !isExpanded) {
+    // Only act as an "open this card" trigger when no modal is open. After
+    // arrow-navigating away, this card collapses but keeps DOM focus — without
+    // the `backgrounded` guard, Space would re-open it and yank the modal back
+    // to the video you started on.
+    if ((event.key === 'Enter' || event.key === ' ') && isInteractive && !isExpanded && !backgrounded) {
       event.preventDefault()
       handleSelect()
     }
@@ -405,6 +410,7 @@ export const VideoCard = memo(function VideoCard({
                 <div>
                   <span className="block w-fit text-[10px] text-white/80 tracking-widest uppercase font-mono rounded px-2 py-1 bg-black/45 backdrop-blur-sm">{video.company}</span>
                   <h2 className="w-fit max-w-[85%] mt-1 text-sm sm:text-base font-light text-white tracking-tight rounded px-2 py-1 bg-black/45 backdrop-blur-sm">{video.title}</h2>
+                  <VideoMetrics sourceUrl={video.sourceUrl} className="mt-1" />
                 </div>
                 <div className="flex items-center gap-2 pointer-events-auto">
                   {video.sourceUrl && (
@@ -491,7 +497,10 @@ export const VideoCard = memo(function VideoCard({
         {isGhost ? (
           <span className="text-xs text-muted shrink-0 font-mono">Soon</span>
         ) : (
-          <span className="text-xs text-muted shrink-0 font-mono">{formatDuration(video.duration)}</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <VideoMetrics sourceUrl={video.sourceUrl} variant="inline" />
+            <span className="text-xs text-muted shrink-0 font-mono">{formatDuration(video.duration)}</span>
+          </div>
         )}
       </div>
     </article>
