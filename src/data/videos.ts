@@ -67,21 +67,22 @@ export const videos: Video[] = [
     id: '4',
     slug: 'demo',
     companySlug: 'cluely',
-    title: 'Cluely Demo',
+    title: 'Cluely — Cheat on Everything',
     company: 'Cluely',
     companyLogoUrl: 'https://img.logo.dev/cluely.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
     companyFounded: 2024,
-    description: 'Think of Cluely as your invisible co-pilot for high-stakes conversations. Whether you\'re in a job interview or leading a client meeting, it delivers real-time suggestions and talking points—so you\'re never caught off guard.',
+    description: 'Cluely launches with a deliberately provocative pitch—"cheat on everything." An always-on AI that quietly sees your screen and hears your calls, feeding you real-time answers in interviews, meetings, and beyond.',
     videoUrl: 'https://stream.mux.com/ibtmZW4VNhCS4MrpP8ZF00jNOQKmcYtMLZh5k1ZVWwds.m3u8',
     thumbnailUrl: 'https://image.mux.com/ibtmZW4VNhCS4MrpP8ZF00jNOQKmcYtMLZh5k1ZVWwds/thumbnail.webp?time=5',
     duration: 99,
     aspectRatio: '16:9',
     websiteUrl: 'https://cluely.com',
+    sourceUrl: 'https://x.com/im_roy_lee/status/1914061483149001132',
     credits: [
-      { role: 'Creator', name: 'Roy Lee', handle: 'chunginlee', bio: 'Co-founder & CEO of Cluely. Former filmmaker who transitioned to tech founder. Known for creating the viral Cluely demo that broke the internet.', contactUrl: 'https://twitter.com/chunginlee', imageUrl: 'https://unavatar.io/x/im_roy_lee', twitterHandle: 'im_roy_lee', instagramHandle: 'imroylee' }
+      { role: 'Founder', name: 'Roy Lee', handle: 'im_roy_lee', url: 'https://cluely.com', bio: 'Co-founder & CEO of Cluely. Went viral for the interview-assistant that got him suspended from Columbia, then turned it into Cluely.', contactUrl: 'https://x.com/im_roy_lee', imageUrl: 'https://unavatar.io/x/im_roy_lee', twitterHandle: 'im_roy_lee' }
     ],
     featured: false,
-    publishedDate: '2024-11-20',
+    publishedDate: '2025-04-20',
   },
   {
     id: '5',
