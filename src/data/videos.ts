@@ -451,6 +451,28 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2026-06-16',
   },
+  {
+    id: '23',
+    slug: 'factory-2',
+    companySlug: 'factory',
+    title: 'Factory 2.0',
+    company: 'Factory',
+    companyLogoUrl: 'https://img.logo.dev/factory.ai?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2023,
+    description: 'Factory 2.0 reframes AI coding from single agents into full "software factories"—Droids that carry shared context across the entire development lifecycle, from triage and planning through code generation, validation, and release.',
+    videoUrl: 'https://stream.mux.com/7ncWiaxX8YsMqNukclALAeTFDMJ00mQbTJQciZX67c3g.m3u8',
+    thumbnailUrl: 'https://image.mux.com/7ncWiaxX8YsMqNukclALAeTFDMJ00mQbTJQciZX67c3g/thumbnail.webp?time=5',
+    duration: 30,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://factory.ai',
+    twitterUrl: 'https://twitter.com/FactoryAI',
+    sourceUrl: 'https://x.com/FactoryAI/status/2066588050617249904',
+    credits: [
+      { role: 'In-house', name: 'Factory', handle: 'FactoryAI', url: 'https://factory.ai', bio: 'Factory builds Droids—AI agents for autonomous software engineering across the entire development lifecycle. Founded in 2023 by Matan Grinberg and Eno Reyes.', contactUrl: 'https://x.com/FactoryAI', imageUrl: 'https://img.logo.dev/factory.ai?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark', twitterHandle: 'FactoryAI' }
+    ],
+    featured: false,
+    publishedDate: '2026-06-15',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
