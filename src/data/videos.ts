@@ -429,6 +429,28 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2026-06-04',
   },
+  {
+    id: '22',
+    slug: 'agents',
+    companySlug: 'framer',
+    title: 'Framer 3.0',
+    company: 'Framer',
+    companyLogoUrl: 'https://img.logo.dev/framer.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2014,
+    description: 'Framer 3.0 turns the design canvas into an AI-native publishing platform: Agents build and edit sites from prompts, Branching lets you experiment in parallel without breaking what is live, and a new Community makes it easy to share and remix work—all wrapped in a fully redesigned interface.',
+    videoUrl: 'https://stream.mux.com/urEM4ajbn3t27ZuitaQREqQqDFpIlZfqHuii1UHv20200.m3u8',
+    thumbnailUrl: 'https://image.mux.com/urEM4ajbn3t27ZuitaQREqQqDFpIlZfqHuii1UHv20200/thumbnail.webp?time=5',
+    duration: 75,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://framer.com',
+    twitterUrl: 'https://twitter.com/framer',
+    sourceUrl: 'https://x.com/framer/status/2066939366568804508',
+    credits: [
+      { role: 'In-house', name: 'Framer', handle: 'framer', url: 'https://framer.com', bio: 'The design tool for building production websites on a canvas. Founded in Amsterdam in 2014 by Koen Bok and Jorn van Dijk.', contactUrl: 'https://x.com/framer', imageUrl: 'https://img.logo.dev/framer.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark', twitterHandle: 'framer' }
+    ],
+    featured: false,
+    publishedDate: '2026-06-16',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
