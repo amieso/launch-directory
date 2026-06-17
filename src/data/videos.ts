@@ -732,6 +732,28 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2025-12-29',
   },
+  {
+    id: '36',
+    slug: 'v2',
+    companySlug: 'lovable',
+    title: 'Lovable 2.0',
+    company: 'Lovable',
+    companyLogoUrl: 'https://img.logo.dev/lovable.dev?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2023,
+    description: 'Lovable 2.0—the AI app builder gets smarter, adds multiplayer collaboration, and ships stronger security. Describe what you want and watch it become a real, deployable web app.',
+    videoUrl: 'https://stream.mux.com/u7a6E5PbDRzXCUo00NItK0028TBaFh4CmQ5K00R00NufnZs.m3u8',
+    thumbnailUrl: 'https://image.mux.com/u7a6E5PbDRzXCUo00NItK0028TBaFh4CmQ5K00R00NufnZs/thumbnail.webp?time=5',
+    duration: 80,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://lovable.dev',
+    twitterUrl: 'https://x.com/Lovable',
+    sourceUrl: 'https://x.com/Lovable/status/1915481869585703191',
+    credits: [
+      { role: 'In-house', name: 'Lovable', handle: 'Lovable', url: 'https://lovable.dev', bio: 'The AI app builder that turns natural-language prompts into real, deployable web apps. Founded in 2023.', contactUrl: 'https://x.com/Lovable', imageUrl: 'https://img.logo.dev/lovable.dev?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark', twitterHandle: 'Lovable' }
+    ],
+    featured: false,
+    publishedDate: '2025-04-24',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
