@@ -864,6 +864,28 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2024-01-24',
   },
+  {
+    id: '42',
+    slug: 'edge',
+    companySlug: 'navan',
+    title: 'Navan Edge',
+    company: 'Navan',
+    companyLogoUrl: 'https://img.logo.dev/navan.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2015,
+    description: 'Navan launches Navan Edge—an AI travel assistant for frequent business travelers that books flights, hotels, and restaurants, backed by round-the-clock human support.',
+    videoUrl: 'https://stream.mux.com/mWivfAJ014uOGlLcGleCa00CqcyLr2J02zrVZM7CN9rLzI.m3u8',
+    thumbnailUrl: 'https://image.mux.com/mWivfAJ014uOGlLcGleCa00CqcyLr2J02zrVZM7CN9rLzI/thumbnail.webp?time=5',
+    duration: 80,
+    aspectRatio: '4:5',
+    websiteUrl: 'https://navan.com',
+    twitterUrl: 'https://x.com/Navan',
+    sourceUrl: 'https://x.com/Navan/status/2028502791237284067?s=20',
+    credits: [
+      { role: 'In-house', name: 'Navan', handle: 'Navan', url: 'https://navan.com', bio: 'Business travel and expense management platform that combines corporate travel booking, expense reporting, and corporate cards in one AI-powered system.', contactUrl: 'https://x.com/Navan', imageUrl: 'https://img.logo.dev/navan.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark', twitterHandle: 'Navan' }
+    ],
+    featured: false,
+    publishedDate: '2026-03-02',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 

@@ -25,6 +25,8 @@ function expandedWidth(aspectRatio: Video['aspectRatio']): string {
       return 'min(880px, calc(100vw - 2rem), calc(100svh - 7rem))'
     case '9:16':
       return 'min(520px, calc(100vw - 2rem), calc((100svh - 7rem) * 9 / 16))'
+    case '4:5':
+      return 'min(700px, calc(100vw - 2rem), calc((100svh - 7rem) * 4 / 5))'
     default:
       return 'min(1254px, calc(100vw - 2rem), calc((100svh - 7rem) * 16 / 9))'
   }
@@ -36,6 +38,8 @@ function aspectClass(aspectRatio: Video['aspectRatio']): string {
       return 'aspect-square'
     case '9:16':
       return 'aspect-[9/16]'
+    case '4:5':
+      return 'aspect-[4/5]'
     default:
       return 'aspect-video'
   }
