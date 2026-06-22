@@ -17,6 +17,27 @@ npm run lint         # ESLint
 
 No test framework is configured.
 
+## Adding a Video
+
+End-to-end flow for turning a source URL (x.com / YouTube / local file) into a live, deep-linkable video. The pipeline scripts do the heavy lifting; the manual part is writing good editorial metadata.
+
+**Prerequisites:** `yt-dlp` and `ffprobe` on PATH (`brew install yt-dlp ffmpeg`). Mux creds (`MUX_TOKEN_ID`, `MUX_TOKEN_SECRET`) must be in `.env` or `.env.local` — the scripts load both from the working dir. These are gitignored, so on any non-Vercel machine (e.g. a server checkout) they must be provisioned manually; without them, drafts get created with empty playback URLs. For login-gated x.com videos, set `TWITTER_COOKIES_FILE` to a Netscape-format cookies export.
+
+1. **Ingest** — `npm run ingest "<source-url>"` (accepts multiple URLs or a local `./file.mp4`). Downloads via yt-dlp, probes duration/aspect ratio via ffprobe, uploads to Mux, and inserts a draft `Video` into `src/data/videos.ts` above the `// INGEST_ANCHOR` line with `TODO:` placeholders and empty `videoUrl`/`thumbnailUrl`. Dedupes on `sourceUrl` + file checksum, so re-running is safe. In-flight uploads tracked in `scripts/.ingest-state.json` (gitignored).
+2. **Publish** — `npm run publish`. Polls Mux; once an asset is `ready` it fills `videoUrl` (`https://stream.mux.com/{playbackId}.m3u8`) and `thumbnailUrl` (`.../thumbnail.webp?time=5`). Mux encoding is async — **re-run until it reports `0 still pending`**.
+3. **Editorial metadata** — replace the `TODO:` placeholders in the new `videos.ts` entry. Get real details via `yt-dlp --skip-download --dump-json "<url>"` and/or `WebFetch` the source/company site. Match nearby entries:
+   - **`slug`** — concise, describes the *video* not the company (company is already in the URL). Fix the auto-slug which often repeats the company name: prefer `framer/3-0`, `openai/atlas`, not `framer/framer-introducing-framer`. Must be globally unique as `companySlug/slug` (build-time guard enforces this).
+   - **`title`** — clean display title (`Framer 3.0`), strip "Company - Introducing…" boilerplate.
+   - **`company`** / **`companySlug`** — display name + stable lowercase URL key.
+   - **`companyLogoUrl`** — logo.dev: `https://img.logo.dev/{domain}?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark` (reuse token from other entries).
+   - **`description`** — 1–2 sentence neutral editorial summary in Lowkey's voice (em dashes welcome); avoid raw marketing copy.
+   - **`websiteUrl`**, **`twitterUrl`** — optional links.
+   - **`credits`** — ≥1 entry. `role` is `'In-house'` (company made it), `'Agency'`, or `'Creator'`. Include `name`, `handle`, `url`, `bio`, `contactUrl`, `imageUrl`, `twitterHandle` — see nearby entries for shape.
+   - **`featured`** — leave `false` unless it should hit the homepage hero. **`publishedDate`** — keep ingest-derived (source upload date). **`duration`** / **`aspectRatio`** — already correct from ffprobe; don't touch.
+   - Chapters are optional, live in `src/data/chapters.ts` keyed by video `id`; only add if asked.
+4. **Verify** — `npm run build` runs `generateStaticParams` for `/[company]/[slug]` plus the slug-uniqueness guard, so a clean build confirms the route renders. Video is live at `/{companySlug}/{slug}`.
+5. **Commit** — the source file moves to `uploads/processed/` (gitignored); the committed change is just `src/data/videos.ts` (+ `chapters.ts` if edited). Commit as `Add {Company} {Title} video` and push to `main`.
+
 ## Architecture
 
 ### Routing & Pages
