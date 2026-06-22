@@ -12,7 +12,6 @@ import { VideoMetrics } from './video-metrics'
 import { useIntroContext } from '@/context/intro-context'
 import { trackGoal, GOALS } from '@/lib/analytics'
 import { usePageVisible } from '@/hooks/use-page-visible'
-import { usePreviewLoadSlot } from '@/hooks/use-preview-load-slot'
 
 const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const
 const SWIPE_CLOSE_THRESHOLD = 56
@@ -58,8 +57,6 @@ interface VideoCardProps {
   preload?: boolean
   /** Another card is focused — pause this player's loading to free bandwidth. */
   backgrounded?: boolean
-  /** Grid position — drives top-down first-frame load ordering (lower = sooner). */
-  priority?: number
 }
 
 export const VideoCard = memo(function VideoCard({
@@ -71,7 +68,6 @@ export const VideoCard = memo(function VideoCard({
   disablePlayback = false,
   preload = false,
   backgrounded = false,
-  priority = 0,
 }: VideoCardProps) {
   const playerRef = useRef<VideoPlayerHandle>(null)
   const boxRef = useRef<HTMLDivElement>(null)
@@ -115,37 +111,11 @@ export const VideoCard = memo(function VideoCard({
   }
   const elevated = isExpanded || isCollapsing
 
-  // Top-down load ordering. Rather than mount every in-view player at once and
-  // let their HLS loads race the network (paint order became random), gate when
-  // each gated preview is allowed to START: it waits for a slot from the shared
-  // queue (admitted by grid position), then mounts and stays mounted. Crucially
-  // we gate *mounting*, not loading — a waiting card makes zero requests, so we
-  // never call stopLoad before the manifest parses (which leaves HLS.js stuck).
-  const [gaveUpSlot, setGaveUpSlot] = useState(false)
-  const [loadStarted, setLoadStarted] = useState(false)
-  const gatedPreview = isInteractive && !isExpanded && !preload
-  const wantsLoadSlot = gatedPreview && inView && !loadStarted
-  const hasLoadSlot = usePreviewLoadSlot(priority, wantsLoadSlot)
-
-  // Once admitted (or we give up waiting), this preview starts for good.
-  useEffect(() => {
-    if (hasLoadSlot || gaveUpSlot) setLoadStarted(true)
-  }, [hasLoadSlot, gaveUpSlot])
-
-  // Fail-safe: a preview waiting for a slot gives up after a few seconds and
-  // starts anyway. This bounds the queue to *delaying* loads, never blocking
-  // them — a slow/cold asset can't stall the cards below it, and a quiet bug in
-  // the queue can't strand a preview forever.
-  useEffect(() => {
-    if (!wantsLoadSlot) return
-    const timer = setTimeout(() => setGaveUpSlot(true), 3000)
-    return () => clearTimeout(timer)
-  }, [wantsLoadSlot])
-
-  // Mount the player when it's this card's turn (gate open), or immediately for
-  // expanded / arrow-nav (preload) players. Once mounted, stays mounted to avoid
-  // reload churn while scrolling.
-  const shouldMountPlayer = isInteractive && (isExpanded || preload || (inView && loadStarted))
+  // Mount the HLS player as soon as the card nears the viewport so above-the-
+  // fold previews all load in parallel (fastest first paint). Expanded or
+  // preloaded (arrow-nav) cards always mount. Once started, stay mounted to
+  // avoid reload churn while scrolling.
+  const shouldMountPlayer = isInteractive && (inView || isExpanded || preload)
 
   // Pre-fetch the sharp rendition on hover, while expanded, or when queued as
   // an arrow-nav neighbour — so it's already high-quality by the time it fills

@@ -85,7 +85,6 @@ export function VideoGrid({ videos, columns = 4, partnerCardAt }: VideoGridProps
               instant={instant}
               preload={neighborIds.has(item.video.id)}
               backgrounded={expandedVideoId !== null && expandedVideoId !== item.video.id}
-              priority={index}
             />
           ) : (
             <PartnerCard />
