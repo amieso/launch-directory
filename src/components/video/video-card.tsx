@@ -3,7 +3,7 @@
 import { memo, useCallback, useEffect, useRef, useState, type CSSProperties, type TouchEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Chapter, Video } from '@/types/video'
-import { formatDuration } from '@/lib/utils'
+import { formatDuration, sizedThumbnail } from '@/lib/utils'
 import { CompanyLink } from '@/components/ui/company-link'
 import { PlayIcon, PauseIcon } from '@/components/ui/player-icons'
 import { VideoPlayer, VideoPlayerHandle, QualityLevel } from './modal/video-player'
@@ -11,6 +11,7 @@ import { PlayerControls } from './modal/player-controls'
 import { VideoMetrics } from './video-metrics'
 import { useIntroContext } from '@/context/intro-context'
 import { trackGoal, GOALS } from '@/lib/analytics'
+import { usePageVisible } from '@/hooks/use-page-visible'
 
 const SHARED_LAYOUT_TRANSITION = { duration: 0.3, ease: [0.22, 1, 0.36, 1] } as const
 const SWIPE_CLOSE_THRESHOLD = 56
@@ -81,9 +82,14 @@ export const VideoCard = memo(function VideoCard({
   // single continuous track. Restore with getChaptersForVideo(video.id) later.
   const chapters: Chapter[] = []
   const { shouldShowIntro, introComplete, registerMedia, markMediaLoaded } = useIntroContext()
+  const pageVisible = usePageVisible()
 
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null)
   const [inView, setInView] = useState(false)
+  // Whether the card is *currently* near the viewport. Unlike `inView` (which
+  // latches true on first sight to keep the player mounted), this toggles as the
+  // card scrolls in and out so we can pause off-screen previews.
+  const [isVisible, setIsVisible] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [hasRenderedFrame, setHasRenderedFrame] = useState(false)
   const [isPlaying, setIsPlaying] = useState(true)
@@ -121,21 +127,35 @@ export const VideoCard = memo(function VideoCard({
   }, [wantsHighRes, videoEl])
 
   useEffect(() => {
-    if (!isInteractive || inView) return
+    if (!isInteractive) return
     const el = slotRef.current
     if (!el) return
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setInView(true)
-          observer.disconnect()
-        }
+        const entry = entries[entries.length - 1]
+        if (!entry) return
+        setIsVisible(entry.isIntersecting)
+        if (entry.isIntersecting) setInView(true)
       },
       { rootMargin: '200px' },
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [isInteractive, inView])
+  }, [isInteractive])
+
+  // A grid preview should only run when it's actually worth running: on-screen,
+  // in a foregrounded tab, and not hidden behind an open modal. Players stay
+  // mounted to avoid reload churn, but otherwise we pause — without this a long
+  // grid keeps every <video> it has ever shown looping at once (progressive
+  // jank), and a backgrounded tab keeps decoding forever. The matching
+  // `backgrounded` prop below also halts Mux fetching in these states, so an
+  // idle tab streams ~nothing. Expanded cards are exempt — they're being watched.
+  const previewActive = isVisible && pageVisible && !backgrounded
+  useEffect(() => {
+    if (!videoEl || isExpanded) return
+    if (previewActive) videoEl.play().catch(() => {})
+    else videoEl.pause()
+  }, [videoEl, isExpanded, previewActive])
 
   // Grab the underlying <video> element once VideoPlayer has mounted.
   useEffect(() => {
@@ -438,14 +458,14 @@ export const VideoCard = memo(function VideoCard({
             <div className="absolute inset-0 bg-surface" />
           ) : disablePlayback ? (
             <img
-              src={video.thumbnailUrl}
+              src={sizedThumbnail(video.thumbnailUrl, 960)}
               alt={video.title}
               className="absolute inset-0 h-full w-full object-cover"
             />
           ) : (
             <>
               <img
-                src={video.thumbnailUrl}
+                src={sizedThumbnail(video.thumbnailUrl, 640)}
                 alt=""
                 aria-hidden="true"
                 className={`absolute inset-0 z-20 h-full w-full object-cover transition-opacity duration-150 ${
@@ -458,7 +478,7 @@ export const VideoCard = memo(function VideoCard({
                   src={video.videoUrl}
                   startMuted={!isExpanded}
                   expanded={isExpanded}
-                  backgrounded={backgrounded}
+                  backgrounded={backgrounded || (!isExpanded && !preload && (!isVisible || !pageVisible))}
                   onQualityLevelsChange={setQualityLevels}
                   className="absolute inset-0 z-10 !rounded-none"
                 />
