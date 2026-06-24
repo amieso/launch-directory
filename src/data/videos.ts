@@ -886,6 +886,28 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2026-03-02',
   },
+  {
+    id: '43',
+    slug: 'glaze',
+    companySlug: 'raycast',
+    title: 'Glaze',
+    company: 'Raycast',
+    companyLogoUrl: 'https://img.logo.dev/raycast.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2020,
+    description: 'Raycast launches Glaze—a local-first desktop app builder where you create custom Mac apps by chatting with AI, with deep OS integration and a community store to publish and discover what others have made.',
+    videoUrl: 'https://stream.mux.com/T9NJAlX6AhnWVkcbu2m00702u1Xas7dSDQ00Ee9nOChC0000.m3u8',
+    thumbnailUrl: 'https://image.mux.com/T9NJAlX6AhnWVkcbu2m00702u1Xas7dSDQ00Ee9nOChC0000/thumbnail.webp?time=5',
+    duration: 56,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://www.glaze.app',
+    twitterUrl: 'https://x.com/raycast',
+    sourceUrl: 'https://x.com/raycast/status/2029180822838759703?s=20',
+    credits: [
+      { role: 'In-house', name: 'Raycast', handle: 'raycast', url: 'https://raycast.com', bio: 'Productivity tool that lets you control your tools with a few keystrokes—launching apps, running scripts, and now building desktop apps with AI via Glaze.', contactUrl: 'https://x.com/raycast', imageUrl: 'https://img.logo.dev/raycast.com?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark', twitterHandle: 'raycast' }
+    ],
+    featured: false,
+    publishedDate: '2026-03-04',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
