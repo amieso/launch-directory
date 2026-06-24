@@ -10,7 +10,9 @@ export const metadata: Metadata = {
 
 const CONTACT_EMAIL = 'hello@lowkey.so'
 
-const PRIMARY_IDS = ['advertise', 'data']
+// Note: ad blockers strip elements whose id contains "advertise"/"ad-", so the
+// Advertise option keeps a neutral id ('reach') to survive cosmetic filtering.
+const PRIMARY_IDS = ['reach', 'data']
 const PRIMARY_OPTIONS = PRIMARY_IDS.map((id) => PARTNER_OPTIONS.find((o) => o.id === id)!)
 const SECONDARY_OPTIONS = PARTNER_OPTIONS.filter((o) => !PRIMARY_IDS.includes(o.id))
 

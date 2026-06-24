@@ -9,7 +9,7 @@ export interface PartnerOption {
 
 export const PARTNER_OPTIONS: PartnerOption[] = [
   {
-    id: 'advertise',
+    id: 'reach',
     name: 'Advertise',
     tagline: 'Reach founders & product teams',
     description:

@@ -4,7 +4,7 @@ import { trackGoal, GOALS } from '@/lib/analytics'
 
 interface PartnerCtaLinkProps {
   href: string
-  /** Partner option id (e.g. 'advertise', 'data') for attribution. */
+  /** Partner option id (e.g. 'reach', 'data') for attribution. */
   optionId: string
   /** Optional DOM id, used as a scroll anchor target (e.g. /partner#data). */
   id?: string
