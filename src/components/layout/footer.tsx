@@ -17,7 +17,7 @@ export function Footer() {
               rel="noopener noreferrer"
               className="text-xs text-muted hover:text-foreground transition-colors"
             >
-              X
+              Follow on X
             </Link>
           </div>
         </div>
