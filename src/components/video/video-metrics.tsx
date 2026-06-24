@@ -45,9 +45,17 @@ export function VideoMetrics({
 
   if (variant === 'inline') {
     return (
-      <span className={`inline-flex items-center gap-1 text-xs text-muted shrink-0 font-mono ${className}`}>
-        <HeartIcon className="w-3 h-3" />
-        {formatCount(m.likes)}
+      <span className={`inline-flex items-center gap-2 text-xs text-muted shrink-0 font-mono ${className}`}>
+        {m.impressions > 0 && (
+          <span className="inline-flex items-center gap-1">
+            <ViewsIcon className="w-3 h-3" />
+            {formatCount(m.impressions)}
+          </span>
+        )}
+        <span className="inline-flex items-center gap-1">
+          <HeartIcon className="w-3 h-3" />
+          {formatCount(m.likes)}
+        </span>
       </span>
     )
   }

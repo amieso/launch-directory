@@ -12,6 +12,23 @@ export function formatDuration(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
+// Human-readable platform name for a source URL, used for "View on X" links.
+// Falls back to "Source" for hosts we don't recognize.
+export function platformName(url: string): string {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '')
+    if (host === 'x.com' || host === 'twitter.com') return 'X'
+    if (host === 'youtube.com' || host === 'youtu.be' || host.endsWith('.youtube.com')) return 'YouTube'
+    if (host === 'vimeo.com' || host.endsWith('.vimeo.com')) return 'Vimeo'
+    if (host === 'linkedin.com' || host.endsWith('.linkedin.com')) return 'LinkedIn'
+    if (host === 'tiktok.com' || host.endsWith('.tiktok.com')) return 'TikTok'
+    if (host === 'instagram.com' || host.endsWith('.instagram.com')) return 'Instagram'
+    return 'Source'
+  } catch {
+    return 'Source'
+  }
+}
+
 // Canonical path for a video. The single place URLs are built, so links can't
 // drift from the route. Keyed off stored slugs — never derived from display names.
 export function videoPath(video: Pick<Video, 'companySlug' | 'slug'>): string {

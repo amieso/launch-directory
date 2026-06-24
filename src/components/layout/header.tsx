@@ -78,7 +78,7 @@ export function Header() {
                 href="https://x.com/viewlowkey"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-9 items-center rounded-full px-4 text-sm text-muted hover:text-foreground transition-colors"
+                className="hidden sm:inline-flex h-9 items-center rounded-full px-4 text-sm text-muted hover:text-foreground transition-colors"
               >
                 Follow on X
               </Link>

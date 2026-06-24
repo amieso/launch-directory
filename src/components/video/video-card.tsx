@@ -3,7 +3,7 @@
 import { memo, useCallback, useEffect, useRef, useState, type CSSProperties, type TouchEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Chapter, Video } from '@/types/video'
-import { formatDuration, sizedThumbnail } from '@/lib/utils'
+import { formatDuration, sizedThumbnail, platformName } from '@/lib/utils'
 import { CompanyLink } from '@/components/ui/company-link'
 import { PlayIcon, PauseIcon } from '@/components/ui/player-icons'
 import { VideoPlayer, VideoPlayerHandle, QualityLevel } from './modal/video-player'
@@ -539,7 +539,7 @@ export const VideoCard = memo(function VideoCard({
                       }}
                       className="h-7 px-3 text-xs rounded-full bg-black/45 text-white border border-white/20 hover:bg-black/55 inline-flex items-center justify-center font-medium transition-colors"
                     >
-                      Post
+                      View on {platformName(video.sourceUrl)}
                     </a>
                   )}
                   {video.websiteUrl && (
