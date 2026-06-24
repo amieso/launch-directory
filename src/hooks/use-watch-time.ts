@@ -10,7 +10,7 @@ import { trackGoal, GOALS } from '@/lib/analytics'
 const MAX_TICK_DELTA = 1.5
 
 // Coarse buckets for the DataFast dashboard goal (string metadata only). The
-// rankable source of truth is the Redis counter; this is just for eyeballing.
+// rankable source of truth is Redis; this is just for eyeballing.
 function bucketSeconds(seconds: number): string {
   if (seconds < 5) return '<5'
   if (seconds < 15) return '5-15'
@@ -20,29 +20,47 @@ function bucketSeconds(seconds: number): string {
   return '180+'
 }
 
+// One id per expand session, so the stream's per-flush entries can be deduped
+// back into a single session. crypto.randomUUID is everywhere modern; the
+// fallback only matters in ancient/insecure contexts.
+function newSessionId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
 /**
- * Accumulate how many seconds a video is actually watched while expanded, and
- * report increments to /api/watch. Reports the *delta* since the last flush on
+ * Track watch-time per expand session: how many seconds the video is actually
+ * watched, reported to /api/watch as increments. Each report carries the
+ * session id and cumulative progress, so the backend keeps both an all-time
+ * counter and a per-session stream. Reports the *delta* since the last flush on
  * each of: tab hidden, page hide, and card collapse/unmount — so a watch that
  * ends by closing the tab still counts, and a long watch isn't lost to a single
  * teardown event. Scoped to the expanded player; grid-preview autoplay never
  * counts.
  */
 export function useWatchTime(video: Video, videoEl: HTMLVideoElement | null, isExpanded: boolean) {
-  // Engaged content-seconds this expand session, and how much we've already
-  // reported, so each flush sends only what's new.
+  // Engaged content-seconds this expand session, how much we've already
+  // reported (so each flush sends only what's new), and the session's id.
   const watchedRef = useRef(0)
   const reportedRef = useRef(0)
   const lastTimeRef = useRef<number | null>(null)
+  const sessionIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!isExpanded || !videoEl) return
+    sessionIdRef.current = newSessionId()
 
     const flush = () => {
-      const pending = Math.floor(watchedRef.current) - reportedRef.current
+      const watched = Math.floor(watchedRef.current)
+      const pending = watched - reportedRef.current
       if (pending < MIN_REPORTABLE_SECONDS) return
-      reportedRef.current += pending
-      reportWatchTime(video.id, pending)
+      reportedRef.current = watched
+      reportWatchTime({
+        video_id: video.id,
+        seconds: pending,
+        session_id: sessionIdRef.current ?? undefined,
+        watched,
+      })
     }
 
     const handleTimeUpdate = () => {
@@ -70,7 +88,7 @@ export function useWatchTime(video: Video, videoEl: HTMLVideoElement | null, isE
       window.removeEventListener('pagehide', flush)
       // Card is collapsing or unmounting — send the tail of this session to the
       // counter, then ping DataFast once with the session total for the
-      // dashboard, then reset so the next open is a fresh count.
+      // dashboard, then reset so the next open is a fresh session.
       flush()
       const total = Math.floor(watchedRef.current)
       if (total >= MIN_REPORTABLE_SECONDS) {
@@ -84,6 +102,7 @@ export function useWatchTime(video: Video, videoEl: HTMLVideoElement | null, isE
       watchedRef.current = 0
       reportedRef.current = 0
       lastTimeRef.current = null
+      sessionIdRef.current = null
     }
   }, [isExpanded, videoEl, video.id, video.companySlug, video.slug])
 }

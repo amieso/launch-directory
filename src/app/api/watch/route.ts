@@ -4,12 +4,21 @@ import { Redis } from '@upstash/redis'
 import { Ratelimit } from '@upstash/ratelimit'
 import { videos } from '@/data/videos'
 
-// Watch-time collection for the future "Popular" ranking. State lives in Upstash
-// Redis as one hash per video (`video:{id}` → { seconds, sessions }) — counters,
-// not a relational store, which is the right shape and write profile for bursty
-// increments fired from every viewer. The eventual ranking script reads these
-// totals and writes a `popularity` field onto videos.ts, mirroring the existing
-// X-metrics prebuild flow.
+// Watch-time collection for the future "Popular" ranking + per-video session
+// analytics. State lives in Upstash Redis in two shapes:
+//   • `video:{id}` hash → { seconds } — an all-time engaged-seconds counter,
+//     O(1) to read, the fast path for ranking. Incremented by per-flush deltas.
+//   • `video:{id}:sessions` stream → one entry per flush, fields { sid, s, p }.
+//     Entry IDs are millisecond timestamps (free chronological/time-window
+//     reads). A reader groups by `sid` and takes max(`s`) to reconstruct each
+//     session's watch-time — so the multiple flushes a session may emit (tab
+//     switch, then close) collapse to one session, and the session COUNT is the
+//     number of distinct sids (no overcount). Length-capped so it can't grow
+//     without bound.
+// Counters/streams, not a relational store — the right shape and write profile
+// for bursty increments fired from every viewer. The eventual ranking script
+// reads these and writes a `popularity` field onto videos.ts, mirroring the
+// existing X-metrics prebuild flow.
 //
 // This endpoint is public and unauthenticated (anonymous visitors have no
 // credential), so it can't trust the caller. Two guards keep casual abuse cheap
@@ -26,7 +35,15 @@ const durationById = new Map(videos.map((v) => [v.id, v.duration]))
 const bodySchema = z.object({
   video_id: z.string(),
   seconds: z.number().positive(),
+  // Optional so an older deployed client (counter-only) still validates during a
+  // deploy rollover; the current client always sends both.
+  session_id: z.string().optional(),
+  watched: z.number().positive().optional(),
 })
+
+// Bound per-video stream growth. ~10k sessions is years of history at this
+// site's scale; `~` lets Redis trim cheaply at radix-tree-node boundaries.
+const SESSIONS_MAXLEN = 10_000
 
 // Built lazily so the route stays importable — and the app keeps building —
 // when Redis isn't configured. Local dev without creds simply no-ops.
@@ -94,12 +111,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Rate limited' }, { status: 429 })
   }
 
-  const seconds = Math.min(Math.round(parsed.data.seconds), maxSeconds)
   const key = `video:${parsed.data.video_id}`
-  await Promise.all([
-    redis.hincrby(key, 'seconds', seconds),
-    redis.hincrby(key, 'sessions', 1),
-  ])
+  // Clamp the delta to the video's length so one report can't claim more
+  // watching than the video physically contains.
+  const delta = Math.min(Math.round(parsed.data.seconds), maxSeconds)
+  const ops: Promise<unknown>[] = [redis.hincrby(key, 'seconds', delta)]
 
+  // Per-session record. `s` is this session's progress into the video (capped at
+  // its length); `p` is that as a percentage. Multiple flushes share `sid`, so a
+  // reader takes max(`s`) per `sid` for the session's watch-time.
+  if (parsed.data.session_id && parsed.data.watched !== undefined) {
+    const progress = Math.min(Math.round(parsed.data.watched), maxSeconds)
+    const pct = maxSeconds > 0 ? Math.min(100, Math.round((progress / maxSeconds) * 100)) : 0
+    ops.push(
+      redis.xadd(
+        `${key}:sessions`,
+        '*',
+        { sid: parsed.data.session_id, s: progress, p: pct },
+        { trim: { type: 'MAXLEN', threshold: SESSIONS_MAXLEN, comparison: '~' } },
+      ),
+    )
+  }
+
+  await Promise.all(ops)
   return NextResponse.json({ ok: true })
 }
