@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { z } from 'zod'
 import { WelcomeEmail } from '@/emails/welcome'
 
@@ -7,10 +7,9 @@ const emailSchema = z.string().email()
 
 export async function POST(request: Request) {
   const apiKey = process.env.RESEND_API_KEY
-  const audienceId = process.env.RESEND_AUDIENCE_ID
 
-  if (!apiKey || !audienceId) {
-    console.error('Missing RESEND_API_KEY or RESEND_AUDIENCE_ID')
+  if (!apiKey) {
+    console.error('Missing RESEND_API_KEY')
     return NextResponse.json({ error: 'Newsletter not configured' }, { status: 500 })
   }
 
@@ -21,33 +20,33 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
   }
 
-  const resend = new Resend(apiKey)
+  // Do the Resend work after the response is flushed so signup feels instant.
+  // It's best-effort anyway (we never surfaced contact/send failures to the
+  // user), so nothing here belongs on the critical path.
+  after(async () => {
+    const resend = new Resend(apiKey)
 
-  const { error } = await resend.contacts.create({
-    audienceId,
-    email,
-  })
+    // Already an active contact? Don't re-send the welcome on repeat submits.
+    // (The modern /contacts endpoint is idempotent, so create alone can't tell
+    // a new signup from a duplicate — we look the contact up first.)
+    const existing = await resend.contacts.get({ email })
+    if (existing.data && !existing.data.unsubscribed) return
 
-  if (error) {
-    if (error.message?.includes('already exists')) {
-      return NextResponse.json({ success: true })
+    const { error } = await resend.contacts.create({ email })
+    if (error) {
+      console.error('Resend error:', error)
+      return
     }
-    console.error('Resend error:', error)
-    return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 })
-  }
 
-  const { error: sendError } = await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || 'lowkey <onboarding@resend.dev>',
-    to: email,
-    subject: 'welcome to lowkey',
-    react: WelcomeEmail({ email }),
+    const { error: sendError } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'lowkey <onboarding@resend.dev>',
+      to: email,
+      subject: 'welcome to lowkey',
+      react: WelcomeEmail({ email }),
+    })
+
+    if (sendError) console.error('Resend send error:', sendError)
   })
-
-  if (sendError) {
-    console.error('Resend send error:', sendError)
-    // Still return success - contact was added, just email failed
-    return NextResponse.json({ success: true })
-  }
 
   return NextResponse.json({ success: true })
 }

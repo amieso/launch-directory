@@ -3,9 +3,8 @@ import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
   const apiKey = process.env.RESEND_API_KEY
-  const audienceId = process.env.RESEND_AUDIENCE_ID
 
-  if (!apiKey || !audienceId) {
+  if (!apiKey) {
     return NextResponse.json({ error: 'Not configured' }, { status: 500 })
   }
 
@@ -18,7 +17,6 @@ export async function POST(request: Request) {
   const resend = new Resend(apiKey)
 
   const { error } = await resend.contacts.remove({
-    audienceId,
     email,
   })
 
