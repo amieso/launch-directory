@@ -908,6 +908,29 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2026-03-04',
   },
+  {
+    id: '44',
+    slug: 'mornings-with-chrome',
+    companySlug: 'the-browser-company',
+    title: 'Mornings with Chrome',
+    company: 'The Browser Company',
+    companyLogoUrl: 'https://img.logo.dev/thebrowser.company?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2019,
+    description: 'A tongue-in-cheek Dia ad that frames a chaotic "morning with Chrome" against a calmer start to the workday — closing on diabrowser.com. Shared by Browser Company CEO Josh Miller as their best-performing feature of all time.',
+    videoUrl: 'https://stream.mux.com/eBCy8dOl1gSHKswNMt25Ss5TJghHu6sOYo9MStFehTs.m3u8',
+    thumbnailUrl: 'https://image.mux.com/eBCy8dOl1gSHKswNMt25Ss5TJghHu6sOYo9MStFehTs/thumbnail.webp?time=5',
+    duration: 30,
+    aspectRatio: '9:16',
+    websiteUrl: 'https://diabrowser.com',
+    twitterUrl: 'https://x.com/browsercompany',
+    sourceUrl: 'https://x.com/joshm/status/2070137108174365141?s=20',
+    credits: [
+      { role: 'In-house', name: 'The Browser Company', handle: 'browsercompany', url: 'https://thebrowser.company', bio: 'The team behind Arc and Dia. Known for cinematic product films that set the bar for startup marketing.', contactUrl: 'https://x.com/browsercompany', imageUrl: 'https://img.logo.dev/thebrowser.company?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark', twitterHandle: 'browsercompany', instagramHandle: 'thebrowsercompany' },
+      { role: 'Creator', name: 'Josh Miller', handle: 'joshm', url: 'https://x.com/joshm', bio: 'CEO and co-founder of The Browser Company, makers of Arc and Dia.', contactUrl: 'https://x.com/joshm', imageUrl: 'https://unavatar.io/twitter/joshm', twitterHandle: 'joshm' }
+    ],
+    featured: false,
+    publishedDate: '2026-06-25',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
