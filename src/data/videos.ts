@@ -931,6 +931,29 @@ export const videos: Video[] = [
     featured: false,
     publishedDate: '2026-06-25',
   },
+  {
+    id: '45',
+    slug: 'think-together',
+    companySlug: 'notion',
+    title: 'Think Together',
+    company: 'Notion',
+    companyLogoUrl: 'https://img.logo.dev/notion.so?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark',
+    companyFounded: 2013,
+    description: 'A Notion brand film that pushes back on the "lone genius with an army of chatbots" story of AI — a montage of archival footage arguing the best things are built together. Closes on the company manifesto: Think Together.',
+    videoUrl: 'https://stream.mux.com/02W9hjEIUJZ8ehQ1f1Uuvb02dvFHtzVtEArT01IRxgbToE.m3u8',
+    thumbnailUrl: 'https://image.mux.com/02W9hjEIUJZ8ehQ1f1Uuvb02dvFHtzVtEArT01IRxgbToE/thumbnail.webp?time=124',
+    duration: 125,
+    aspectRatio: '16:9',
+    websiteUrl: 'https://www.notion.so',
+    twitterUrl: 'https://x.com/NotionHQ',
+    sourceUrl: 'https://x.com/ivanhzhao/status/2038670159259619644?s=20',
+    credits: [
+      { role: 'In-house', name: 'Notion', handle: 'NotionHQ', url: 'https://www.notion.so', bio: 'The connected workspace for notes, docs, and projects. Known for design-led, manifesto-style brand films.', contactUrl: 'https://x.com/NotionHQ', imageUrl: 'https://img.logo.dev/notion.so?token=pk_S2abCJUVRued_UW_go8tKA&format=png&theme=dark', twitterHandle: 'NotionHQ', instagramHandle: 'notionhq' },
+      { role: 'Creator', name: 'Ivan Zhao', handle: 'ivanhzhao', url: 'https://x.com/ivanhzhao', bio: 'CEO and co-founder of Notion.', contactUrl: 'https://x.com/ivanhzhao', imageUrl: 'https://unavatar.io/twitter/ivanhzhao', twitterHandle: 'ivanhzhao' }
+    ],
+    featured: false,
+    publishedDate: '2026-03-30',
+  },
   // INGEST_ANCHOR — scripts/ingest.mjs inserts new video drafts above this line. Keep it.
 ]
 
