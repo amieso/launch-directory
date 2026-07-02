@@ -50,7 +50,7 @@ export function HeroSection() {
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-foreground leading-[1.1] tracking-tight">
           The rumors are true.
           <br />
-          These are the best launch videos.
+          These are the best product launch videos.
         </h1>
         <p className="mt-4 text-base md:text-lg text-muted leading-relaxed max-w-xl mx-auto">
           Subscribe to get the latest launches delivered to your inbox.
